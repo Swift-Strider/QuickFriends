@@ -1,0 +1,24 @@
+{
+    "$schema": "https://getcomposer.org/schema.json",
+
+    "name": "diamondstrider1/plugin-template",
+    "description": "A template for a pocketmine plugin.",
+    "type": "project",
+    "license": "MIT",
+
+    "require": {
+		"pocketmine/pocketmine-mp": "4.0.0"
+    },
+    "require-dev": {
+        "phpstan/phpstan": "^1.6"
+    },
+
+    "scripts": {
+        "setup": [
+            "echo \"includes:\" > phpstan.neon",
+            "echo \"    - phpstan.neon.dist\" >> phpstan.neon",
+            "composer install"
+        ],
+        "phpstan": "vendor/bin/phpstan analyze -c phpstan.neon"
+    }
+}

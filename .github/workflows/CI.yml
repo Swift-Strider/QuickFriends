@@ -1,0 +1,24 @@
+name: CI
+on:
+  - push
+  - pull_request
+jobs:
+  phpstan:
+    name: PHPStan
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php-version:
+          - "8.0"
+    steps:
+      - uses: actions/checkout@v2
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{matrix.php-version}}
+      - name: phpstan configure
+        run: |
+          cp .github/phpstan.neon.ci phpstan.neon
+          composer install --ignore-platform-reqs
+      - name: phpstan analyze
+        run: |
+          composer run phpstan
