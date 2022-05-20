@@ -18,7 +18,7 @@ jobs:
           install-path: "./bin"
       - name: phpstan configure
         run: |
-          cp .github/phpstan.neon.ci phpstan.neon
+          cp .github/phpstan.neon.ci tools/phpstan/phpstan.neon
           composer install --ignore-platform-reqs
           composer install --working-dir=tools/phpstan
       - name: phpstan analyze

@@ -13,12 +13,12 @@
 
     "scripts": {
         "setup": [
-            "echo includes:> phpstan.neon",
-            "echo     - phpstan.neon.dist>> phpstan.neon",
+            "echo includes:> tools/phpstan/phpstan.neon",
+            "echo     - phpstan.neon.dist>> tools/phpstan/phpstan.neon",
             "composer install"
         ],
-        "fmt": "tools/php-cs-fixer/vendor/bin/php-cs-fixer fix src",
-        "phpstan": "tools/phpstan/vendor/bin/phpstan analyze -c phpstan.neon"
+        "fmt": "tools/php-cs-fixer/vendor/bin/php-cs-fixer fix --config=tools/php-cs-fixer/.php-cs-fixer.php",
+        "phpstan": "tools/phpstan/vendor/bin/phpstan analyze -c tools/phpstan/phpstan.neon"
     },
 
     "config": {

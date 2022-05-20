@@ -3,7 +3,7 @@
 /tools/*/vendor
 
 # PhpStan
-/phpstan.neon
+/tools/phpstan/phpstan.neon
 
 # PHP CS Fixer
 .php-cs-fixer.cache
