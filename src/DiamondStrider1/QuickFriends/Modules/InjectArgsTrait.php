@@ -59,20 +59,8 @@ trait InjectArgsTrait
                     $ctorArgs[] = $context->getOwningPlugin();
                     break;
                 case Logger::class === $typeName:
-                    $start = strrpos(self::class, '\\', -1);
-                    $end = strrpos(self::class, 'Module', -1);
-                    if (false === $start) {
-                        $start = 0;
-                    } else {
-                        ++$start;
-                    }
-                    if (false === $end) {
-                        $end = strlen(self::class);
-                    }
-
                     $pluginLogger = $context->getOwningPlugin()->getLogger();
-                    $prefix = substr(self::class, $start, $end - $start);
-
+                    $prefix = ModuleUtils::getModuleName(self::class);
                     $ctorArgs[] = new PrefixedLogger($pluginLogger, $prefix);
                     break;
                 default:

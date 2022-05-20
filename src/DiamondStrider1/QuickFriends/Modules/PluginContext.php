@@ -38,7 +38,8 @@ class PluginContext implements Context
      */
     public function tryGet(string $moduleClass): ?Module
     {
-        $this->logger->debug('Try Get Module ('.$moduleClass.')');
+        $moduleName = ModuleUtils::getModuleName($moduleClass);
+        $this->logger->debug('Try Get Module ('.$moduleName.')');
 
         /** @phpstan-var T $module */
         $module = $this->modules[$moduleClass] ?? null;
@@ -53,10 +54,11 @@ class PluginContext implements Context
      */
     public function put(Module $module): void
     {
-        $this->logger->debug('Put Module ('.$module::class.')');
+        $moduleName = ModuleUtils::getModuleName($module::class);
+        $this->logger->debug('Put Module ('.$moduleName.')');
 
         if (isset($this->modules[$module::class])) {
-            throw new DomainException('Attempt to register two modules of the same class ('.$module::class.')');
+            throw new DomainException('Attempt to register two modules of the same class ('.$moduleName.')');
         }
 
         $this->modules[$module::class] = $module;
