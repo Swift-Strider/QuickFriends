@@ -22,6 +22,7 @@
             "echo     - phpstan.neon.dist>> phpstan.neon",
             "composer install"
         ],
+        "fmt": "tools/php-cs-fixer/vendor/bin/php-cs-fixer fix src",
         "phpstan": "vendor/bin/phpstan analyze -c phpstan.neon"
     },
 
