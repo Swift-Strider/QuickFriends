@@ -1,8 +1,8 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
 
-    "name": "diamondstrider1/plugin-template",
-    "description": "A template for a pocketmine plugin.",
+    "name": "diamondstrider1/pmmp-quick-friends",
+    "description": "Fast friending system for PocketMine server owners! ",
     "type": "project",
     "license": "MIT",
 
@@ -15,8 +15,8 @@
 
     "scripts": {
         "setup": [
-            "echo \"includes:\" > phpstan.neon",
-            "echo \"    - phpstan.neon.dist\" >> phpstan.neon",
+            "echo includes:> phpstan.neon",
+            "echo     - phpstan.neon.dist>> phpstan.neon",
             "composer install"
         ],
         "phpstan": "vendor/bin/phpstan analyze -c phpstan.neon"

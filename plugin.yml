@@ -1,6 +1,6 @@
-name: Main
-author: Author
+name: QuickFriends
+author: DiamondStrider1
 
-main: Author\TemplatePlugin\Main
+main: DiamondStrider1\QuickFriends\Main
 version: 1.0.0
 api: 4.0.0

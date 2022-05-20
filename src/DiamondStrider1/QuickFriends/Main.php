@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Author\TemplatePlugin;
+namespace DiamondStrider1\QuickFriends;
 
 use pocketmine\plugin\PluginBase;
 
