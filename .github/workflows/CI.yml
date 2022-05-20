@@ -23,3 +23,22 @@ jobs:
       - name: phpstan analyze
         run: |
           composer run phpstan
+  code-format:
+    name: Code Format
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php-version:
+          - "8.0"
+    steps:
+      - uses: actions/checkout@v2
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{matrix.php-version}}
+      - name: php-cs-fixer install
+        run: |
+          composer install --ignore-platform-reqs
+          composer install --working-dir=tools/php-cs-fixer
+      - name: php-cs-fixer run
+        run: |
+          composer run fmt -- --dry-run
