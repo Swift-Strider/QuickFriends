@@ -14,7 +14,7 @@ trait InjectArgsTrait
     {
         /** @var ?static $module */
         $module = $context->tryGet(self::class);
-        if ($module === null) {
+        if (null === $module) {
             $module = self::create($context);
             $context->put($module);
         }
@@ -27,9 +27,10 @@ trait InjectArgsTrait
         $reflect = new ReflectionClass(self::class);
         $ctor = $reflect->getConstructor();
 
-        if ($ctor === null) {
+        if (null === $ctor) {
             /** @var static $module */
             $module = $reflect->newInstance();
+
             return $module;
         }
 
@@ -38,24 +39,25 @@ trait InjectArgsTrait
         foreach ($params as $param) {
             $type = $param->getType();
             if (!$type instanceof ReflectionNamedType) {
-                throw new LogicException("(" . self::class . ")'s constructor must have single-type parameters!");
+                throw new LogicException('('.self::class.")'s constructor must have single-type parameters!");
             }
 
             $typeName = $type->getName();
             if (!class_exists($typeName)) {
-                throw new LogicException("Error creating module arguments: Class does not exist! (" . $type->getName() . ")");
+                throw new LogicException('Error creating module arguments: Class does not exist! ('.$type->getName().')');
             }
             $typeClass = new ReflectionClass($typeName);
 
             if (!$typeClass->implementsInterface(Module::class)) {
-                throw new LogicException("(" . self::class . ")'s constructor must have only Module-subtypes for parameters!");
+                throw new LogicException('('.self::class.")'s constructor must have only Module-subtypes for parameters!");
             }
 
-            $ctorArgs[] = $typeClass->getMethod("get")->invoke(null, $context);
+            $ctorArgs[] = $typeClass->getMethod('get')->invoke(null, $context);
         }
 
         /** @var static $module */
         $module = $reflect->newInstanceArgs($ctorArgs);
+
         return $module;
     }
 }
