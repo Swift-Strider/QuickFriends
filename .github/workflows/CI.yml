@@ -19,6 +19,7 @@ jobs:
         run: |
           cp .github/phpstan.neon.ci phpstan.neon
           composer install --ignore-platform-reqs
+          composer install --working-dir=tools/phpstan
       - name: phpstan analyze
         run: |
           composer run phpstan
