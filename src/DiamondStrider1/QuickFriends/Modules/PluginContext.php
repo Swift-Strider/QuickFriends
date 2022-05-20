@@ -14,12 +14,14 @@ class PluginContext implements Context
     public static function fromPlugin(Plugin $plugin): self
     {
         return new self(
+            $plugin,
             new PrefixedLogger($plugin->getLogger(), 'PluginContext')
         );
     }
 
     public function __construct(
-        public Logger $logger
+        private Plugin $plugin,
+        private Logger $logger,
     ) {
     }
 
@@ -58,5 +60,10 @@ class PluginContext implements Context
         }
 
         $this->modules[$module::class] = $module;
+    }
+
+    public function getOwningPlugin(): Plugin
+    {
+        return $this->plugin;
     }
 }

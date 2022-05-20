@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace DiamondStrider1\QuickFriends\Modules;
 
+use Logger;
 use LogicException;
+use pocketmine\plugin\Plugin;
+use PrefixedLogger;
 use ReflectionClass;
 use ReflectionNamedType;
 
@@ -43,16 +46,38 @@ trait InjectArgsTrait
             }
 
             $typeName = $type->getName();
-            if (!class_exists($typeName)) {
+            if (!class_exists($typeName) && !interface_exists($typeName)) {
                 throw new LogicException('Error creating module arguments: Class does not exist! ('.$type->getName().')');
             }
             $typeClass = new ReflectionClass($typeName);
 
-            if (!$typeClass->implementsInterface(Module::class)) {
-                throw new LogicException('('.self::class.")'s constructor must have only Module-subtypes for parameters!");
-            }
+            switch (true) {
+                case $typeClass->implementsInterface(Module::class):
+                    $ctorArgs[] = $typeClass->getMethod('get')->invoke(null, $context);
+                    break;
+                case Plugin::class === $typeName:
+                    $ctorArgs[] = $context->getOwningPlugin();
+                    break;
+                case Logger::class === $typeName:
+                    $start = strrpos(self::class, '\\', -1);
+                    $end = strrpos(self::class, 'Module', -1);
+                    if (false === $start) {
+                        $start = 0;
+                    } else {
+                        ++$start;
+                    }
+                    if (false === $end) {
+                        $end = strlen(self::class);
+                    }
 
-            $ctorArgs[] = $typeClass->getMethod('get')->invoke(null, $context);
+                    $pluginLogger = $context->getOwningPlugin()->getLogger();
+                    $prefix = substr(self::class, $start, $end - $start);
+
+                    $ctorArgs[] = new PrefixedLogger($pluginLogger, $prefix);
+                    break;
+                default:
+                    throw new LogicException('('.self::class.")'s constructor's parameters must only be type Module, Plugin or Logger!");
+            }
         }
 
         /** @var static $module */
