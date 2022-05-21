@@ -6,6 +6,10 @@ namespace DiamondStrider1\QuickFriends\Modules;
 
 final class ModuleUtils
 {
+    private function __construct()
+    {
+    }
+
     public static function getModuleName(string $moduleClass): string
     {
         $start = strrpos($moduleClass, '\\', -1);
