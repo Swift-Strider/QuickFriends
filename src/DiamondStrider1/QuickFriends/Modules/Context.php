@@ -29,6 +29,11 @@ interface Context extends PluginOwned
     public function put(Module $module): void;
 
     /**
+     * Closes the context and all of the modules put inside of it.
+     */
+    public function close(): void;
+
+    /**
      * Get the plugin that owns this context.
      */
     public function getOwningPlugin(): Plugin;

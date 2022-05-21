@@ -64,6 +64,17 @@ final class PluginContext implements Context
         $this->modules[$module::class] = $module;
     }
 
+    public function close(): void
+    {
+        $this->logger->debug('Closing Context...');
+        foreach ($this->modules as $module) {
+            $moduleName = ModuleUtils::getModuleName($module::class);
+            $this->logger->debug('Closing Module ('.$moduleName.')');
+            $module->close();
+        }
+        $this->logger->debug('Done Closing Context!');
+    }
+
     public function getOwningPlugin(): Plugin
     {
         return $this->plugin;
