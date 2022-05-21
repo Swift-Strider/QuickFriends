@@ -8,7 +8,8 @@
 
     "require": {
         "php": "^8.0.0",
-		"pocketmine/pocketmine-mp": "4.0.0"
+		"pocketmine/pocketmine-mp": "4.0.0",
+        "sof3/libasynql": "^4.0"
     },
 
     "scripts": {
