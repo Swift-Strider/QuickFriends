@@ -9,7 +9,7 @@ use Logger;
 use pocketmine\plugin\Plugin;
 use PrefixedLogger;
 
-class PluginContext implements Context
+final class PluginContext implements Context
 {
     public static function fromPlugin(Plugin $plugin): self
     {

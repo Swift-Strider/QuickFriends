@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace DiamondStrider1\QuickFriends\Modules;
 
-class ModuleUtils
+final class ModuleUtils
 {
     public static function getModuleName(string $moduleClass): string
     {

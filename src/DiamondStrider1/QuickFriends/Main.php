@@ -7,7 +7,7 @@ namespace DiamondStrider1\QuickFriends;
 use DiamondStrider1\QuickFriends\Modules\PluginContext;
 use pocketmine\plugin\PluginBase;
 
-class Main extends PluginBase
+final class Main extends PluginBase
 {
     public function onEnable(): void
     {
