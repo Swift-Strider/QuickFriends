@@ -1,5 +1,5 @@
 # This can be bypassed with the permission:
-# quickfriends.friendlimitbypass
+# quickfriends.bypass.friend-limit
 max-friend-limit: 10
 
 joinable-worlds:
