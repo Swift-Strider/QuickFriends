@@ -14,7 +14,8 @@ final class DatabaseConfig
      * @phpstan-param array<string, mixed> $settings
      */
     public function __construct(
-        private array $settings
+        private array $settings,
+        private bool $enableLogging,
     ) {
     }
 
@@ -32,6 +33,7 @@ final class DatabaseConfig
         $mysqlPassword = $mysql->rString('password');
         $mysqlSchema = $mysql->rString('schema');
         $workerLimit = $parser->rInt('worker-limit');
+        $enableLogging = $parser->rBool('enable-logging');
 
         try {
             return ParsedValue::value(new self(
@@ -47,7 +49,8 @@ final class DatabaseConfig
                         'schema' => $mysqlSchema->take(),
                     ],
                     'worker-limit' => $workerLimit->take(),
-                ]
+                ],
+                $enableLogging->take()
             ));
         } catch (ParseStopException) {
             return ParsedValue::error('Could not parse Database Config.');
@@ -60,5 +63,10 @@ final class DatabaseConfig
     public function getSettingsArray(): array
     {
         return $this->settings;
+    }
+
+    public function enableLogging(): bool
+    {
+        return $this->enableLogging;
     }
 }

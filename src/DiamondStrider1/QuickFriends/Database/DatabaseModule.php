@@ -32,7 +32,10 @@ final class DatabaseModule implements Module
             'sqlite' => 'sqlite.sql',
             'mysql' => 'mysql.sql',
         ], false);
-        $this->connection->setLogger($logger);
+
+        if ($config->enableLogging()) {
+            $this->connection->setLogger($logger);
+        }
 
         $dbResolver = new PromiseResolver();
         $this->db = $dbResolver->getPromise();
