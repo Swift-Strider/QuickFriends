@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace DiamondStrider1\QuickFriends\Database;
 
 use Closure;
+use DiamondStrider1\QuickFriends\Structures\BlockRelation;
 use DiamondStrider1\QuickFriends\Structures\Friendship;
 use DiamondStrider1\QuickFriends\Structures\PlayerData;
 use DiamondStrider1\QuickFriends\Structures\UserPreferences;
@@ -169,6 +170,94 @@ final class Database
                 );
             }
             ($callback)($friendships);
+        }, function ($error) {
+            throw $error;
+        });
+    }
+
+    /**
+     * @phpstan-param Closure(): void $callback
+     */
+    public function blockPlayer(
+        string $player,
+        string $blocked,
+        Closure $callback
+    ): void {
+        $this->db->executeGeneric('quickfriends.block_player', [
+            'player' => $player,
+            'blocked' => $blocked,
+        ], $callback, function ($error) {
+            throw $error;
+        });
+    }
+
+    /**
+     * @phpstan-param Closure(): void $callback
+     */
+    public function unblockPlayer(
+        string $player,
+        string $blocked,
+        Closure $callback
+    ): void {
+        $this->db->executeGeneric('quickfriends.unblock_player', [
+            'player' => $player,
+            'blocked' => $blocked,
+        ], $callback, function ($error) {
+            throw $error;
+        });
+    }
+
+    /**
+     * @phpstan-param Closure(BlockRelation[]): void $callback
+     */
+    public function listBlocked(
+        string $player,
+        Closure $callback
+    ): void {
+        $this->db->executeSelect('quickfriends.list_blocked', [
+            'uuid' => $player,
+        ], function ($rows) use ($callback) {
+            $blockRelations = [];
+            foreach ($rows as $row) {
+                $creationTime = $row['creation_time'];
+                if (is_string($creationTime)) {
+                    $creationTime = strtotime($creationTime);
+                }
+                $blockRelations[] = new BlockRelation(
+                    $row['player'],
+                    $row['blocked'],
+                    $creationTime,
+                );
+            }
+            ($callback)($blockRelations);
+        }, function ($error) {
+            throw $error;
+        });
+    }
+
+    /**
+     * @phpstan-param Closure(BlockRelation[]): void $callback
+     */
+    public function listBlockedBy(
+        string $blocked,
+        Closure $callback
+    ): void {
+        $this->db->executeSelect('quickfriends.list_blocked_by', [
+            'uuid' => $blocked,
+        ], function ($rows) use ($callback) {
+            $blockRelations = [];
+            foreach ($rows as $row) {
+                $creationTime = $row['creation_time'];
+                if (is_string($creationTime)) {
+                    $creationTime = strtotime($creationTime);
+                }
+                $blockRelations[] = new BlockRelation(
+                    $row['player'],
+                    $row['blocked'],
+                    $creationTime,
+                );
+            }
+            ($callback)($blockRelations);
         }, function ($error) {
             throw $error;
         });
