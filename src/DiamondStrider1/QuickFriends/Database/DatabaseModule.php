@@ -8,9 +8,7 @@ use DiamondStrider1\QuickFriends\Config\ConfigModule;
 use DiamondStrider1\QuickFriends\Modules\InjectArgsTrait;
 use DiamondStrider1\QuickFriends\Modules\Module;
 use Logger;
-use pocketmine\plugin\Plugin;
 use pocketmine\plugin\PluginBase;
-use pocketmine\plugin\PluginException;
 use pocketmine\promise\Promise;
 use pocketmine\promise\PromiseResolver;
 use poggit\libasynql\DataConnector;
@@ -25,14 +23,10 @@ final class DatabaseModule implements Module
     private Promise $db;
 
     public function __construct(
-        Plugin $plugin,
+        PluginBase $plugin,
         Logger $logger,
         ConfigModule $configModule,
     ) {
-        if (!$plugin instanceof PluginBase) {
-            throw new PluginException('Expected plugin to extend PluginBase!');
-        }
-
         $config = $configModule->getConfig()->databaseConfig();
         $this->connection = libasynql::create($plugin, $config->getSettingsArray(), [
             'sqlite' => 'sqlite.sql',

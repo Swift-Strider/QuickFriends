@@ -8,9 +8,7 @@ use DiamondStrider1\QuickFriends\Modules\EmptyCloseTrait;
 use DiamondStrider1\QuickFriends\Modules\InjectArgsTrait;
 use DiamondStrider1\QuickFriends\Modules\Module;
 use Logger;
-use pocketmine\plugin\Plugin;
 use pocketmine\plugin\PluginBase;
-use pocketmine\plugin\PluginException;
 
 final class ConfigModule implements Module
 {
@@ -20,13 +18,9 @@ final class ConfigModule implements Module
     private MainConfig $config;
 
     public function __construct(
-        Plugin $plugin,
+        PluginBase $plugin,
         Logger $logger,
     ) {
-        if (!$plugin instanceof PluginBase) {
-            throw new PluginException('Expected plugin to extend PluginBase!');
-        }
-
         $plugin->saveResource('config.yml');
         $data = yaml_parse_file($plugin->getDataFolder().'config.yml');
         $data = is_array($data) ? $data : [];

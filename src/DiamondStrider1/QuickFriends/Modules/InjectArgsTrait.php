@@ -7,6 +7,7 @@ namespace DiamondStrider1\QuickFriends\Modules;
 use Logger;
 use LogicException;
 use pocketmine\plugin\Plugin;
+use pocketmine\plugin\PluginBase;
 use PrefixedLogger;
 use ReflectionClass;
 use ReflectionNamedType;
@@ -58,13 +59,21 @@ trait InjectArgsTrait
                 case Plugin::class === $typeName:
                     $ctorArgs[] = $context->getOwningPlugin();
                     break;
+                case PluginBase::class === $typeName:
+                    $plugin = $context->getOwningPlugin();
+                    if (!$plugin instanceof PluginBase) {
+                        $moduleName = ModuleUtils::getModuleName(self::class);
+                        throw new LogicException("Module \"$moduleName\" requires the context's plugin to extend PluginBase!");
+                    }
+                    $ctorArgs[] = $plugin;
+                    break;
                 case Logger::class === $typeName:
                     $pluginLogger = $context->getOwningPlugin()->getLogger();
                     $prefix = ModuleUtils::getModuleName(self::class);
                     $ctorArgs[] = new PrefixedLogger($pluginLogger, $prefix);
                     break;
                 default:
-                    throw new LogicException('('.self::class.")'s constructor's parameters must only be type Module, Plugin or Logger!");
+                    throw new LogicException('('.self::class.")'s constructor's parameters must only be type Module, Plugin, PluginBase or Logger!");
             }
         }
 
