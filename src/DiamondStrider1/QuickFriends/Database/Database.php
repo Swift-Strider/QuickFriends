@@ -158,14 +158,14 @@ final class Database
         ], function ($rows) use ($callback) {
             $friendships = [];
             foreach ($rows as $row) {
-                $creationTIme = $row['creation_time'];
-                if (is_string($creationTIme)) {
-                    $creationTIme = strtotime($creationTIme);
+                $creationTime = $row['creation_time'];
+                if (is_string($creationTime)) {
+                    $creationTime = strtotime($creationTime);
                 }
                 $friendships[] = new Friendship(
                     $row['requester'],
                     $row['accepter'],
-                    $creationTIme,
+                    $creationTime,
                 );
             }
             ($callback)($friendships);
