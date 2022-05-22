@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace DiamondStrider1\QuickFriends\Database;
 
-use Closure;
 use DiamondStrider1\QuickFriends\Config\ConfigModule;
 use DiamondStrider1\QuickFriends\Modules\InjectArgsTrait;
 use DiamondStrider1\QuickFriends\Modules\Module;
@@ -12,6 +11,8 @@ use Logger;
 use pocketmine\plugin\Plugin;
 use pocketmine\plugin\PluginBase;
 use pocketmine\plugin\PluginException;
+use pocketmine\promise\Promise;
+use pocketmine\promise\PromiseResolver;
 use poggit\libasynql\DataConnector;
 use poggit\libasynql\libasynql;
 
@@ -20,12 +21,8 @@ final class DatabaseModule implements Module
     use InjectArgsTrait;
 
     private DataConnector $connection;
-    private Database $db;
-
-    /**
-     * @phpstan-var (Closure(Database): void)[]
-     */
-    private array $pendingDatabaseConsumers = [];
+    /** @phpstan-var Promise<Database> */
+    private Promise $db;
 
     public function __construct(
         Plugin $plugin,
@@ -42,26 +39,23 @@ final class DatabaseModule implements Module
             'mysql' => 'mysql.sql',
         ], false);
         $this->connection->setLogger($logger);
+
+        $dbResolver = new PromiseResolver();
+        $this->db = $dbResolver->getPromise();
+
         $db = new Database($this->connection);
-        $db->initialize(function () use ($db, $logger) {
+        $db->initialize(function () use ($db, $dbResolver, $logger) {
             $logger->debug('Database Initialized!');
-            $this->db = $db;
-            foreach ($this->pendingDatabaseConsumers as $consumer) {
-                $consumer($this->db);
-            }
+            $dbResolver->resolve($db);
         });
     }
 
     /**
-     * @phpstan-param Closure(Database): void $consumer
+     * @phpstan-return Promise<Database>
      */
-    public function waitForDatabase(Closure $consumer): void
+    public function getDatabase(): Promise
     {
-        if (isset($this->db)) {
-            ($consumer)($this->db);
-        } else {
-            $this->pendingDatabaseConsumers[] = $consumer;
-        }
+        return $this->db;
     }
 
     public function close(): void
