@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS quickfriends_player_friends (
         ON DELETE CASCADE
 )
 -- #&
-CREATE TABLE IF NOT EXISTS quickfriends_player_blocks (
+CREATE TABLE IF NOT EXISTS quickfriends_player_blocked (
     player CHAR(36) NOT NULL,
     blocked CHAR(36) NOT NULL,
     creation_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
