@@ -1,14 +1,29 @@
-# This can be bypassed with the permission:
-# quickfriends.bypass.friend-limit
-max-friend-limit: 10
+social:
+  # Time in seconds before a friend request expires.
+  friend-request-duration: 60
+  # This can be bypassed with the permission:
+  # quickfriends.bypass.friend-limit
+  max-friend-limit: 10
 
-joinable-worlds:
-  # true=allow-list, false=block-list
-  enable-block-list: false
-  # worlds to allow or block
-  worlds:
-    - world
-    - lobby
+  # Worlds where a player may /f join to
+  # teleport to their friend.
+  joinable-worlds:
+    # true=allow-list, false=block-list
+    enable-block-list: false
+    # worlds to allow or block
+    worlds:
+      - world
+      - lobby
+
+preferences:
+  # Every user has their own preference settings,
+  # the default preferences are given to new players.
+  default-preferences:
+    # Wether to disable forms
+    prefers-text: false
+    # May be "everyone", "friends", or "nobody"
+    os-visibility: everyone
+    mute-friend-requests: false
 
 database:
   # The database type. "sqlite" and "mysql" are supported.

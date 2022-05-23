@@ -5,45 +5,41 @@ declare(strict_types=1);
 namespace DiamondStrider1\QuickFriends\Config;
 
 use DiamondStrider1\QuickFriends\Database\DatabaseConfig;
-use DiamondStrider1\QuickFriends\Structures\WorldFilter;
+use DiamondStrider1\QuickFriends\Social\SocialConfig;
+use DiamondStrider1\QuickFriends\Structures\UserPreferencesConfig;
 
 final class MainConfig
 {
     public function __construct(
-        private int $maxFriendLimit,
-        private WorldFilter $joinableWorlds,
+        private SocialConfig $socialConfig,
+        private UserPreferencesConfig $userPreferencesConfig,
         private DatabaseConfig $databaseConfig,
     ) {
     }
 
     public static function parse(Parser $parser): self
     {
-        $maxFriendLimit = $parser->rInt('max-friend-limit');
-        $joinableWorlds = WorldFilter::parse($parser->traverse('joinable-worlds'));
+        $socialConfig = SocialConfig::parse($parser->traverse('social'));
+        $userPreferencesConfig = UserPreferencesConfig::parse($parser->traverse('preferences'));
         $databaseConfig = DatabaseConfig::parse($parser->traverse('database'));
-
-        $maxFriendLimit = $maxFriendLimit->take();
-        if ($maxFriendLimit < -1 || 0 === $maxFriendLimit) {
-            $parser->error('Element "max-friend-limit" must be a nonzero-positive integer or -1 (unlimited friends).');
-        }
 
         $parser->check();
 
         return new self(
-            $maxFriendLimit,
-            $joinableWorlds->take(),
-            $databaseConfig->take()
+            $socialConfig->take(),
+            $userPreferencesConfig->take(),
+            $databaseConfig->take(),
         );
     }
 
-    public function maxFriendLimit(): int
+    public function socialConfig(): SocialConfig
     {
-        return $this->maxFriendLimit;
+        return $this->socialConfig;
     }
 
-    public function joinableWorlds(): WorldFilter
+    public function userPreferencesConfig(): UserPreferencesConfig
     {
-        return $this->joinableWorlds;
+        return $this->userPreferencesConfig;
     }
 
     public function databaseConfig(): DatabaseConfig

@@ -9,6 +9,7 @@ use DiamondStrider1\QuickFriends\Database\DatabaseModule;
 use DiamondStrider1\QuickFriends\Modules\EmptyCloseTrait;
 use DiamondStrider1\QuickFriends\Modules\InjectArgsTrait;
 use DiamondStrider1\QuickFriends\Modules\Module;
+use DiamondStrider1\QuickFriends\Social\SocialModule;
 
 final class MainModule implements Module
 {
@@ -18,6 +19,7 @@ final class MainModule implements Module
     public function __construct(
         public ConfigModule $configModule,
         public DatabaseModule $databaseModule,
+        public SocialModule $socialModule,
     ) {
     }
 }

@@ -8,6 +8,7 @@ use Closure;
 use DiamondStrider1\QuickFriends\Structures\BlockRelation;
 use DiamondStrider1\QuickFriends\Structures\Friendship;
 use DiamondStrider1\QuickFriends\Structures\PlayerData;
+use DiamondStrider1\QuickFriends\Structures\PlayerHandle;
 use DiamondStrider1\QuickFriends\Structures\UserPreferences;
 use poggit\libasynql\DataConnector;
 
@@ -50,44 +51,6 @@ final class Database
                     $row['username'],
                     $row['last_os'],
                     $lastJoinTime,
-                ));
-            }
-        }, function ($error) {
-            throw $error;
-        });
-    }
-
-    /**
-     * @phpstan-param Closure(): void $callback
-     */
-    public function setPlayerData(
-        string $uuid,
-        string $username,
-        string $lastOs,
-        Closure $callback
-    ): void {
-        $this->db->executeGeneric('quickfriends.set_player_data', [
-            'uuid' => $uuid,
-            'username' => $username,
-            'last_os' => $lastOs,
-        ], $callback, function ($error) {
-            throw $error;
-        });
-    }
-
-    /**
-     * @phpstan-param Closure(?UserPreferences): void $callback
-     */
-    public function getUserPreferences(string $uuid, Closure $callback): void
-    {
-        $this->db->executeSelect('quickfriends.get_user_preferences', [
-            'uuid' => $uuid,
-        ], function ($rows) use ($callback) {
-            $row = $rows[0] ?? null;
-            if (null === $row) {
-                ($callback)(null);
-            } else {
-                ($callback)(new UserPreferences(
                     (bool) $row['prefers_text'],
                     $row['os_visibility'],
                     (bool) $row['mute_friend_requests'],
@@ -101,16 +64,40 @@ final class Database
     /**
      * @phpstan-param Closure(): void $callback
      */
-    public function setUserPreferences(
-        string $uuid,
-        UserPreferences $userPreferences,
+    public function touchPlayerData(
+        PlayerHandle $player,
+        UserPreferences $defaultPreferences,
         Closure $callback
     ): void {
-        $this->db->executeGeneric('quickfriends.set_user_preferences', [
+        $this->db->executeGeneric('quickfriends.touch_player_data', [
+            'uuid' => $player->uuid(),
+            'username' => $player->username(),
+            'last_os' => $player->lastOs(),
+            'last_join_time' => $player->lastJoinTime(),
+            'default_prefers_text' => (int) $defaultPreferences->prefersText(),
+            'default_os_visibility' => $defaultPreferences->osVisibility(),
+            'default_mute_friend_requests' => (int) $defaultPreferences->muteFriendRequests(),
+        ], $callback, function ($error) {
+            throw $error;
+        });
+    }
+
+    /**
+     * @phpstan-param Closure(): void $callback
+     */
+    public function updatePlayerData(
+        string $uuid,
+        PlayerData $playerData,
+        Closure $callback
+    ): void {
+        $this->db->executeGeneric('quickfriends.update_player_data', [
             'uuid' => $uuid,
-            'prefers_text' => (int) $userPreferences->prefersText(),
-            'os_visibility' => $userPreferences->osVisibility(),
-            'mute_friend_requests' => (int) $userPreferences->muteFriendRequests(),
+            'username' => $playerData->username(),
+            'last_os' => $playerData->lastOs(),
+            'last_join_time' => $playerData->lastJoinTime(),
+            'prefers_text' => (int) $playerData->preferences()->prefersText(),
+            'os_visibility' => $playerData->preferences()->osVisibility(),
+            'mute_friend_requests' => (int) $playerData->preferences()->muteFriendRequests(),
         ], $callback, function ($error) {
             throw $error;
         });
@@ -120,13 +107,25 @@ final class Database
      * @phpstan-param Closure(): void $callback
      */
     public function addFriend(
-        string $requester,
-        string $accepter,
+        PlayerHandle $requester,
+        PlayerHandle $accepter,
+        int $creationTime,
+        UserPreferences $defaultPreferences,
         Closure $callback
     ): void {
         $this->db->executeGeneric('quickfriends.add_friend', [
-            'requester' => $requester,
-            'accepter' => $accepter,
+            'requester_uuid' => $requester->uuid(),
+            'requester_username' => $requester->username(),
+            'requester_last_os' => $requester->lastOs(),
+            'requester_last_join_time' => $requester->lastJoinTime(),
+            'accepter_uuid' => $accepter->uuid(),
+            'accepter_username' => $accepter->username(),
+            'accepter_last_os' => $accepter->lastOs(),
+            'accepter_last_join_time' => $accepter->lastJoinTime(),
+            'creation_time' => $creationTime,
+            'default_prefers_text' => (int) $defaultPreferences->prefersText(),
+            'default_os_visibility' => $defaultPreferences->osVisibility(),
+            'default_mute_friend_requests' => (int) $defaultPreferences->muteFriendRequests(),
         ], $callback, function ($error) {
             throw $error;
         });
@@ -179,13 +178,25 @@ final class Database
      * @phpstan-param Closure(): void $callback
      */
     public function blockPlayer(
-        string $player,
-        string $blocked,
+        PlayerHandle $player,
+        PlayerHandle $blocked,
+        int $creationTime,
+        UserPreferences $defaultPreferences,
         Closure $callback
     ): void {
         $this->db->executeGeneric('quickfriends.block_player', [
-            'player' => $player,
-            'blocked' => $blocked,
+            'player_uuid' => $player->uuid(),
+            'player_username' => $player->username(),
+            'player_last_os' => $player->lastOs(),
+            'player_last_join_time' => $player->lastJoinTime(),
+            'blocked_uuid' => $blocked->uuid(),
+            'blocked_username' => $blocked->username(),
+            'blocked_last_os' => $blocked->lastOs(),
+            'blocked_last_join_time' => $blocked->lastJoinTime(),
+            'creation_time' => $creationTime,
+            'default_prefers_text' => (int) $defaultPreferences->prefersText(),
+            'default_os_visibility' => $defaultPreferences->osVisibility(),
+            'default_mute_friend_requests' => (int) $defaultPreferences->muteFriendRequests(),
         ], $callback, function ($error) {
             throw $error;
         });
