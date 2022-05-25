@@ -51,9 +51,9 @@ WHERE uuid=:uuid;
 -- #     :username string
 -- #     :last_os string
 -- #     :last_join_time int
--- #     :default_prefers_text int
+-- #     :default_prefers_text bool
 -- #     :default_os_visibility int
--- #     :default_mute_friend_requests int
+-- #     :default_mute_friend_requests bool
 INSERT INTO quickfriends_player_data (
   uuid, username, last_os, last_join_time,
   prefers_text, os_visibility, mute_friend_requests
@@ -67,9 +67,9 @@ INSERT INTO quickfriends_player_data (
 -- #     :username string
 -- #     :last_os string
 -- #     :last_join_time int
--- #     :prefers_text int
+-- #     :prefers_text bool
 -- #     :os_visibility int
--- #     :mute_friend_requests int
+-- #     :mute_friend_requests bool
 REPLACE INTO quickfriends_player_data (
   uuid, username, last_os, last_join_time,
   prefers_text, os_visibility, mute_friend_requests
@@ -87,9 +87,9 @@ REPLACE INTO quickfriends_player_data (
 -- #     :accepter_username string
 -- #     :accepter_last_os string
 -- #     :accepter_last_join_time int
--- #     :default_prefers_text int
+-- #     :default_prefers_text bool
 -- #     :default_os_visibility int
--- #     :default_mute_friend_requests int
+-- #     :default_mute_friend_requests bool
 -- #     :creation_time int
 INSERT INTO quickfriends_player_data (
   uuid, username, last_os, last_join_time,
@@ -107,7 +107,7 @@ INSERT INTO quickfriends_player_data (
   :default_prefers_text, :default_os_visibility, :default_mute_friend_requests
 ) ON CONFLICT(uuid) DO UPDATE SET username=:accepter_username, last_os=:accepter_last_os, last_join_time=:accepter_last_join_time;
 -- #&
-REPLACE INTO quickfriends_player_friends
+INSERT INTO quickfriends_player_friends
 (requester, accepter, creation_time)
 VALUES (:requester_uuid, :accepter_uuid, :creation_time);
 -- # }
@@ -121,7 +121,12 @@ WHERE requester IN :uuids AND accepter IN :uuids;
 SELECT * FROM quickfriends_player_friends
 WHERE requester=:uuid OR accepter=:uuid;
 -- # }
--- # { block_player
+-- # { get_friendship
+-- #     :uuids list:string
+SELECT * FROM quickfriends_player_friends
+WHERE requester IN :uuids AND accepter IN :uuids;
+-- # }
+-- # { add_block
 -- #     :player_uuid string
 -- #     :player_username string
 -- #     :player_last_os string
@@ -130,9 +135,9 @@ WHERE requester=:uuid OR accepter=:uuid;
 -- #     :blocked_username string
 -- #     :blocked_last_os string
 -- #     :blocked_last_join_time int
--- #     :default_prefers_text int
+-- #     :default_prefers_text bool
 -- #     :default_os_visibility int
--- #     :default_mute_friend_requests int
+-- #     :default_mute_friend_requests bool
 -- #     :creation_time int
 INSERT INTO quickfriends_player_data (
   uuid, username, last_os, last_join_time,
@@ -150,15 +155,20 @@ INSERT INTO quickfriends_player_data (
   :default_prefers_text, :default_os_visibility, :default_mute_friend_requests
 ) ON CONFLICT(uuid) DO UPDATE SET username=:blocked_username, last_os=:blocked_last_os, last_join_time=:blocked_last_join_time;
 -- #&
-REPLACE INTO quickfriends_player_blocked
+INSERT INTO quickfriends_player_blocked
 (player, blocked, creation_time) VALUES
 (:player_uuid, :blocked_uuid, :creation_time);
 -- # }
--- # { unblock_player
+-- # { remove_block
 -- #     :player string
 -- #     :blocked string
 DELETE FROM quickfriends_player_blocked
 WHERE player=:player AND blocked=:blocked;
+-- # }
+-- # { get_blocks
+-- #     :uuids list:string
+SELECT * FROM quickfriends_player_blocked
+WHERE player IN :uuids AND blocked IN :uuids;
 -- # }
 -- # { list_blocked
 -- #     :uuid string

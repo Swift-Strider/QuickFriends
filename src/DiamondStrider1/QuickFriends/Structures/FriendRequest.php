@@ -9,7 +9,7 @@ final class FriendRequest
     public function __construct(
         private string $requester,
         private string $receiver,
-        private int $creationTime,
+        private float $creationTime,
         public bool $claimed,
     ) {
     }
@@ -24,7 +24,7 @@ final class FriendRequest
         return $this->receiver;
     }
 
-    public function creationTime(): int
+    public function creationTime(): float
     {
         return $this->creationTime;
     }

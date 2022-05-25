@@ -12,9 +12,11 @@ final class DatabaseConfig
 {
     /**
      * @phpstan-param array<string, mixed> $settings
+     * @phpstan-param "sqlite"|"mysql" $type
      */
     public function __construct(
         private array $settings,
+        private string $type,
         private bool $enableLogging,
     ) {
     }
@@ -36,9 +38,16 @@ final class DatabaseConfig
         $enableLogging = $parser->rBool('enable-logging');
 
         try {
+            $type = $type->take();
+            if ('sqlite' !== $type && 'mysql' !== $type) {
+                $parser->error('Expected element "type" to be set to either "sqlite" or "mysql".');
+                // So phpstan recognizes that $type is "sqlite"|"mysql".
+                throw new ParseStopException();
+            }
+
             return ParsedValue::value(new self(
                 [
-                    'type' => $type->take(),
+                    'type' => $type,
                     'sqlite' => [
                         'file' => $sqliteFile->take(),
                     ],
@@ -50,6 +59,7 @@ final class DatabaseConfig
                     ],
                     'worker-limit' => $workerLimit->take(),
                 ],
+                $type,
                 $enableLogging->take()
             ));
         } catch (ParseStopException) {
@@ -63,6 +73,14 @@ final class DatabaseConfig
     public function getSettingsArray(): array
     {
         return $this->settings;
+    }
+
+    /**
+     * @phpstan-return "sqlite"|"mysql"
+     */
+    public function type(): string
+    {
+        return $this->type;
     }
 
     public function enableLogging(): bool

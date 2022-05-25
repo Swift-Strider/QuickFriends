@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace DiamondStrider1\QuickFriends\Social;
 
+use Closure;
 use DiamondStrider1\QuickFriends\Config\ConfigModule;
 use DiamondStrider1\QuickFriends\Database\DatabaseModule;
 use DiamondStrider1\QuickFriends\Modules\EmptyCloseTrait;
 use DiamondStrider1\QuickFriends\Modules\InjectArgsTrait;
 use DiamondStrider1\QuickFriends\Modules\Module;
-use pocketmine\event\EventPriority;
-use pocketmine\event\player\PlayerQuitEvent;
+use Generator;
 use pocketmine\plugin\PluginBase;
-use pocketmine\scheduler\ClosureTask;
+use SOFe\AwaitGenerator\Await;
 
 final class SocialModule implements Module
 {
@@ -20,6 +20,10 @@ final class SocialModule implements Module
     use EmptyCloseTrait;
 
     private SocialPlayerApi $socialPlayerApi;
+    /**
+     * @phpstan-var (Closure(SocialPlayerApi): void)[]
+     */
+    private array $socialPlayerApiConsumers = [];
 
     public function __construct(
         PluginBase $plugin,
@@ -28,43 +32,34 @@ final class SocialModule implements Module
     ) {
         $socialConfig = $configModule->getConfig()->socialConfig();
         $userPreferencesConfig = $configModule->getConfig()->userPreferencesConfig();
+        $socialRuntime = new SocialRuntime($socialConfig, $plugin);
 
-        $socialDao = new SocialDao(
-            $databaseModule->getDatabase(), $userPreferencesConfig
-        );
-        $socialRuntime = new SocialRuntime($socialConfig);
+        Await::f2c(function () use ($socialConfig, $userPreferencesConfig, $socialRuntime, $databaseModule) { // @phpstan-ignore-line
+            $this->socialPlayerApi = new SocialPlayerApi(
+                $socialRuntime,
+                $socialConfig,
+                $userPreferencesConfig,
+                yield from $databaseModule->getDatabase(),
+            );
 
-        $this->socialPlayerApi = new SocialPlayerApi(
-            $socialDao,
-            $socialRuntime,
-            $socialConfig,
-        );
-
-        $plugin->getScheduler()->scheduleRepeatingTask(new ClosureTask(
-            function () use ($socialRuntime): void {
-                $socialRuntime->clearExpired();
+            foreach ($this->socialPlayerApiConsumers as $consumer) {
+                $consumer($this->socialPlayerApi);
             }
-        ), $socialConfig->friendRequestDuration());
-
-        $pm = $plugin->getServer()->getPluginManager();
-        $pm->registerEvent(
-            PlayerQuitEvent::class,
-            function (PlayerQuitEvent $ev) use ($socialRuntime) {
-                $uuid = $ev->getPlayer()->getUniqueId()->getHex()->toString();
-                $requests = $socialRuntime->getAllFriendRequests();
-                foreach ($requests as $request) {
-                    if ($request->requester() === $uuid || $request->receiver() === $uuid) {
-                        // Invalidate the friend request to cleaned up.
-                        $request->claimed = true;
-                    }
-                }
-            },
-            EventPriority::MONITOR, $plugin, true
-        );
+        });
     }
 
-    public function getSocialPlayerApi(): SocialPlayerApi
+    /**
+     * @phpstan-return Generator<mixed, mixed, mixed, SocialPlayerApi>
+     */
+    public function getSocialPlayerApi(): Generator
     {
-        return $this->socialPlayerApi;
+        if (isset($this->socialPlayerApi)) {
+            return $this->socialPlayerApi;
+        }
+
+        // @phpstan-ignore-next-line
+        return yield from Await::promise(function ($resolve) {
+            $this->socialPlayerApiConsumers[] = $resolve;
+        });
     }
 }

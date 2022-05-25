@@ -7,7 +7,7 @@ namespace DiamondStrider1\QuickFriends\Event;
 use DiamondStrider1\QuickFriends\Structures\BlockRelation;
 use pocketmine\event\Event;
 
-final class UnblockPlayerEvent extends Event
+final class PlayerUnblockedEvent extends Event
 {
     public function __construct(
         private BlockRelation $previousBlockRelation
