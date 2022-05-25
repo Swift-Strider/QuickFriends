@@ -77,16 +77,19 @@ final class SocialRuntime
         );
     }
 
-    public function addFriendRequest(FriendRequest $friendRequest): void
+    public function addFriendRequest(FriendRequest $friendRequest): int
     {
         $id = $friendRequest->requester().':'.$friendRequest->receiver();
         $this->friendRequests[$id] = $friendRequest;
+        $expireTime = $this->socialConfig->friendRequestDuration();
         $this->plugin->getScheduler()->scheduleDelayedTask(
             new ClosureTask(function () use ($id) {
                 unset($this->friendRequests[$id]);
             }),
-            $this->socialConfig->friendRequestDuration() * 20,
+            $expireTime * 20,
         );
+
+        return $expireTime;
     }
 
     public function getFriendRequest(string $requester, string $receiver): ?FriendRequest

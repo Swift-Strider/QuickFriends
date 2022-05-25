@@ -10,7 +10,6 @@ final class FriendRequest
         private string $requester,
         private string $receiver,
         private float $creationTime,
-        public bool $claimed,
     ) {
     }
 

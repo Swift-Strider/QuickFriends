@@ -76,7 +76,7 @@ final class SocialPlayerApi
                 $this->socialConfig->maxFriendLimit()
             );
             if (Codes::FRIEND_LIMIT_REACHED !== $code) {
-                $pending->claimed = true;
+                $this->socialRuntime->removeFriendRequest($receiver->uuid(), $requester->uuid());
             }
             if (Codes::FRIEND_NOW_FRIENDS === $code) {
                 (new FriendAddedEvent(new Friendship(
@@ -113,13 +113,13 @@ final class SocialPlayerApi
             return $translation;
         }
 
-        $this->socialRuntime->addFriendRequest(
+        $expireTime = $this->socialRuntime->addFriendRequest(
             $request = new FriendRequest(
-                $requester->uuid(), $receiver->uuid(), microtime(true), false
+                $requester->uuid(), $receiver->uuid(), microtime(true)
             )
         );
 
-        (new FriendRequestEvent($request, $willNotify))->call();
+        (new FriendRequestEvent($request, $willNotify, $expireTime))->call();
 
         return $translation;
     }

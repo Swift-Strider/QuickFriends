@@ -12,6 +12,7 @@ final class FriendRequestEvent extends Event
     public function __construct(
         private FriendRequest $request,
         private bool $muted,
+        private int $expireTime,
     ) {
     }
 
@@ -23,5 +24,10 @@ final class FriendRequestEvent extends Event
     public function isMuted(): bool
     {
         return $this->muted;
+    }
+
+    public function getExpireTime(): int
+    {
+        return $this->expireTime;
     }
 }
