@@ -11,7 +11,7 @@ use DiamondStrider1\QuickFriends\Config\ParseStopException;
 final class DatabaseConfig
 {
     /**
-     * @phpstan-param array<string, mixed> $settings
+     * @param array<string, mixed> $settings
      * @phpstan-param "sqlite"|"mysql" $type
      */
     public function __construct(
@@ -68,7 +68,7 @@ final class DatabaseConfig
     }
 
     /**
-     * @phpstan-return array<string, mixed>
+     * @return array<string, mixed>
      */
     public function getSettingsArray(): array
     {

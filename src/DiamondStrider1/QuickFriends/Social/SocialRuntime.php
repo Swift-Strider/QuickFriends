@@ -21,11 +21,11 @@ use pocketmine\scheduler\ClosureTask;
 final class SocialRuntime
 {
     /**
-     * @phpstan-var array<string, FriendRequest> $friendRequests key is $requester.$receiver
+     * @var array<string, FriendRequest>
      */
     private array $friendRequests = [];
     /**
-     * @phpstan-var array<string, PlayerHandle>
+     * @var array<string, PlayerHandle>
      */
     private array $handles = [];
 
