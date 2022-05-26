@@ -56,9 +56,9 @@ final class SocialPlayerApi
     /**
      * @phpstan-return Generator<mixed, mixed, mixed, Friendship[]>
      */
-    public function listFriends(string $player): Generator
+    public function listFriends(PlayerHandle $player): Generator
     {
-        return $this->database->listFriends($player);
+        return $this->database->listFriends($player->uuid());
     }
 
     /**
@@ -135,12 +135,12 @@ final class SocialPlayerApi
      *
      * @phpstan-return Generator<mixed, mixed, mixed, self::UNFRIEND_RESULT_*>
      */
-    public function removeFriend(string $remover, string $other): Generator
+    public function removeFriend(PlayerHandle $remover, PlayerHandle $other): Generator
     {
-        $code = yield from $this->database->removeFriendship($remover, $other);
+        $code = yield from $this->database->removeFriendship($remover->uuid(), $other->uuid());
         if ($code instanceof Friendship) {
             (new FriendRemovedEvent(
-                $code, $remover, $other
+                $code, $remover, $other,
             ))->call();
 
             return self::UNFRIEND_RESULT_NOW_REMOVED;
@@ -180,9 +180,9 @@ final class SocialPlayerApi
     /**
      * @phpstan-return Generator<mixed, mixed, mixed, self::UNBLOCK_RESULT_*>
      */
-    public function unblockPlayer(string $player, string $blocked): Generator
+    public function unblockPlayer(PlayerHandle $player, PlayerHandle $blocked): Generator
     {
-        $code = yield from $this->database->removeBlockRelation($player, $blocked);
+        $code = yield from $this->database->removeBlockRelation($player->uuid(), $blocked->uuid());
         if ($code instanceof BlockRelation) {
             (new PlayerUnblockedEvent($code))->call();
 

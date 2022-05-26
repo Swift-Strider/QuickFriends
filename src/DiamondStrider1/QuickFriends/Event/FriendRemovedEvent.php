@@ -5,14 +5,15 @@ declare(strict_types=1);
 namespace DiamondStrider1\QuickFriends\Event;
 
 use DiamondStrider1\QuickFriends\Structures\Friendship;
+use DiamondStrider1\QuickFriends\Structures\PlayerHandle;
 use pocketmine\event\Event;
 
 final class FriendRemovedEvent extends Event
 {
     public function __construct(
         private Friendship $previousFriendship,
-        private string $removerUuid,
-        private string $otherUuid,
+        private PlayerHandle $remover,
+        private PlayerHandle $other,
     ) {
     }
 
@@ -21,13 +22,13 @@ final class FriendRemovedEvent extends Event
         return $this->previousFriendship;
     }
 
-    public function getRemoverUuid(): string
+    public function getRemover(): PlayerHandle
     {
-        return $this->removerUuid;
+        return $this->remover;
     }
 
-    public function getOtherUuid(): string
+    public function getOther(): PlayerHandle
     {
-        return $this->otherUuid;
+        return $this->other;
     }
 }

@@ -41,7 +41,7 @@ final class MainModule implements Module
                 T::assert($code === SocialPlayerApi::FRIEND_RESULT_NOTIFIED, 'Expected FRIEND_RESULT_NOTIFIED', $code);
                 $code = yield from $api->addFriend($second, $first);
                 T::assert($code === SocialPlayerApi::FRIEND_RESULT_NOW_FRIENDS, 'Expected FRIEND_RESULT_NOW_FRIENDS', $code);
-                $friends = yield from $api->listFriends($second->uuid());
+                $friends = yield from $api->listFriends($second);
                 $count = count($friends);
                 T::assert($count === 1, 'Expected to find one friend', $count);
                 /** @var Friendship $friend */
@@ -54,9 +54,9 @@ final class MainModule implements Module
 
             yield from $addFriends();
             $logger->notice("Unfriending players!");
-            $code = yield from $api->removeFriend($second->uuid(), $first->uuid());
+            $code = yield from $api->removeFriend($second, $first);
             T::assert($code === SocialPlayerApi::UNFRIEND_RESULT_NOW_REMOVED, "Expected UNFRIEND_RESULT_NOW_REMOVED", $code);
-            $code = yield from $api->removeFriend($second->uuid(), $first->uuid());
+            $code = yield from $api->removeFriend($second, $first);
             T::assert($code === SocialPlayerApi::UNFRIEND_RESULT_NOT_FRIENDS, "Expected UNFRIEND_RESULT_NOT_FRIENDS", $code);
 
             yield from $addFriends();
@@ -67,9 +67,9 @@ final class MainModule implements Module
             T::assert($code === SocialPlayerApi::BLOCK_RESULT_ALREADY_BLOCKED, "Expected BLOCK_RESULT_ALREADY_BLOCKED", $code);
 
             $logger->notice("Unblocking Players!");
-            $code = yield from $api->unblockPlayer($first->uuid(), $second->uuid());
+            $code = yield from $api->unblockPlayer($first, $second);
             T::assert($code === SocialPlayerApi::UNBLOCK_RESULT_NOW_UNBLOCKED, "Expected UNBLOCK_RESULT_NOW_UNBLOCKED", $code);
-            $code = yield from $api->unblockPlayer($first->uuid(), $second->uuid());
+            $code = yield from $api->unblockPlayer($first, $second);
             T::assert($code === SocialPlayerApi::UNBLOCK_RESULT_NOT_BLOCKED, "Expected UNBLOCK_RESULT_NOT_BLOCKED", $code);
 
             $logger->notice("Blocking Players Again!");
@@ -83,7 +83,7 @@ final class MainModule implements Module
             T::assert($code === SocialPlayerApi::FRIEND_RESULT_BLOCKED_BY, "Expected FRIEND_RESULT_BLOCKED_BY", $code);
 
             $logger->notice("Unblocking, then attempting to friend over the limit!");
-            $code = yield from $api->unblockPlayer($first->uuid(), $second->uuid());
+            $code = yield from $api->unblockPlayer($first, $second);
             T::assert($code === SocialPlayerApi::UNBLOCK_RESULT_NOW_UNBLOCKED, "Expected UNBLOCK_RESULT_NOW_UNBLOCKED", $code);
             $code = yield from $api->addFriend($first, $second);
             T::assert($code === SocialPlayerApi::FRIEND_RESULT_NOTIFIED, "Expected FRIEND_RESULT_NOTIFIED", $code);
