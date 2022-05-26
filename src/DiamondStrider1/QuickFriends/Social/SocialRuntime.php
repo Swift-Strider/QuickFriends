@@ -68,7 +68,7 @@ final class SocialRuntime
                 $uuid = $ev->getPlayer()->getUniqueId()->getHex()->toString();
                 unset($this->handles[$uuid]);
                 foreach ($this->friendRequests as $id => $request) {
-                    if ($request->requester() === $uuid || $request->receiver() === $uuid) {
+                    if ($request->requester()->uuid() === $uuid || $request->receiver()->uuid() === $uuid) {
                         unset($this->friendRequests[$id]);
                     }
                 }
@@ -79,7 +79,7 @@ final class SocialRuntime
 
     public function addFriendRequest(FriendRequest $friendRequest): int
     {
-        $id = $friendRequest->requester().':'.$friendRequest->receiver();
+        $id = $friendRequest->requester()->uuid().':'.$friendRequest->receiver()->uuid();
         $this->friendRequests[$id] = $friendRequest;
         $expireTime = $this->socialConfig->friendRequestDuration();
         $this->plugin->getScheduler()->scheduleDelayedTask(

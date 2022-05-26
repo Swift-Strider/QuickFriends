@@ -12,6 +12,7 @@ final class PlayerData
      * @phpstan-param UserPreferences::OS_VISIBILITY_* $osVisibility
      */
     public function __construct(
+        private string $uuid,
         private string $username,
         private string $lastOs,
         private int $lastJoinTime,
@@ -22,6 +23,11 @@ final class PlayerData
         $this->preferences = new UserPreferences(
             $prefersText, $osVisibility, $muteFriendRequests
         );
+    }
+
+    public function uuid(): string
+    {
+        return $this->uuid;
     }
 
     public function username(): string

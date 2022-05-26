@@ -180,19 +180,36 @@ DROP PROCEDURE IF EXISTS remove_friend;
 CREATE PROCEDURE remove_friend(
     IN player1 CHAR(36),
     IN player2 CHAR(36),
-    OUT o_requester CHAR(36),
-    OUT o_accepter CHAR(36),
-    OUT created TIMESTAMP,
+    OUT o_requester_uuid CHAR(36),
+    OUT o_requester_username CHAR(100),
+    OUT o_requester_last_os CHAR(20),
+    OUT o_requester_last_join_time TIMESTAMP,
+    OUT o_requester_prefers_text BOOLEAN,
+    OUT o_requester_os_visibility INT,
+    OUT o_requester_mute_friend_requests BOOLEAN,
+    OUT o_accepter_uuid CHAR(36),
+    OUT o_accepter_username CHAR(100),
+    OUT o_accepter_last_os CHAR(20),
+    OUT o_accepter_last_join_time TIMESTAMP,
+    OUT o_accepter_prefers_text BOOLEAN,
+    OUT o_accepter_os_visibility INT,
+    OUT o_accepter_mute_friend_requests BOOLEAN,
+    OUT o_creation_time TIMESTAMP,
     OUT status INT
 )
 BEGIN
     DECLARE are_friends BOOLEAN;
 
-    SELECT COUNT(*), requester, accepter, creation_time
-    INTO are_friends, o_requester, o_accepter, created
-    FROM quickfriends_player_friends
+    SELECT COUNT(*), requester.uuid, requester.username, requester.last_os, requester.last_join_time, requester.prefers_text, requester.os_visibility, requester.mute_friend_requests, accepter.uuid, accepter.username, accepter.last_os, accepter.last_join_time, accepter.prefers_text, accepter.os_visibility, accepter.mute_friend_requests, friend.creation_time
+    INTO are_friends, o_requester_uuid, o_requester_username, o_requester_last_os, o_requester_last_join_time, o_requester_prefers_text, o_requester_os_visibility, o_requester_mute_friend_requests, o_accepter_uuid, o_accepter_username, o_accepter_last_os, o_accepter_last_join_time, o_accepter_prefers_text, o_accepter_os_visibility, o_accepter_mute_friend_requests, o_creation_time
+    FROM quickfriends_player_friends friend
+    INNER JOIN quickfriends_player_data requester
+        ON requester.uuid = friend.requester
+    INNER JOIN quickfriends_player_data accepter
+        ON accepter.uuid = friend.accepter
     WHERE requester IN (player1, player2)
-        AND accepter IN (player1, player2);
+        AND accepter IN (player1, player2)
+    GROUP BY requester.uuid, accepter.uuid, requester.username, requester.last_os, requester.last_join_time, requester.prefers_text, requester.os_visibility, requester.mute_friend_requests, accepter.username, accepter.last_os, accepter.last_join_time, accepter.prefers_text, accepter.os_visibility, accepter.mute_friend_requests, friend.creation_time;
 
     IF are_friends THEN
         SET status=-1;
@@ -224,9 +241,11 @@ CREATE PROCEDURE add_block(
 BEGIN
     DECLARE already_blocked BOOLEAN;
     DECLARE rm_status INT;
-    DECLARE _creation_time TIMESTAMP;
-    DECLARE _requester CHAR(36);
-    DECLARE _accepter CHAR(36);
+    DECLARE _timestamp TIMESTAMP;
+    DECLARE _uuid CHAR(36);
+    DECLARE _username CHAR(100);
+    DECLARE _os CHAR(100);
+    DECLARE _int INT;
 
     INSERT INTO quickfriends_player_data (
     uuid, username, last_os, last_join_time,
@@ -250,7 +269,7 @@ BEGIN
     IF already_blocked THEN
         SET status=2;
     ELSE
-        CALL remove_friend(player_uuid, blocked_uuid, _requester, _accepter, _creation_time, rm_status);
+        CALL remove_friend(player_uuid, blocked_uuid, _uuid, _username, _os, _timestamp, _int, _int, _int, _uuid, _username, _os, _timestamp, _int, _int, _int, _timestamp, rm_status);
         IF rm_status = -1 THEN
             SET status=1;
         ELSE
@@ -265,22 +284,40 @@ END;
 DROP PROCEDURE IF EXISTS remove_block;
 -- #&
 CREATE PROCEDURE remove_block(
-    IN player CHAR(36),
-    IN blocked CHAR(36),
-    OUT created TIMESTAMP,
+    IN i_player CHAR(36),
+    IN i_blocked CHAR(36),
+    OUT o_player_username CHAR(100),
+    OUT o_player_last_os CHAR(20),
+    OUT o_player_last_join_time TIMESTAMP,
+    OUT o_player_prefers_text BOOLEAN,
+    OUT o_player_os_visibility INT,
+    OUT o_player_mute_friend_requests BOOLEAN,
+    OUT o_blocked_username CHAR(100),
+    OUT o_blocked_last_os CHAR(20),
+    OUT o_blocked_last_join_time TIMESTAMP,
+    OUT o_blocked_prefers_text BOOLEAN,
+    OUT o_blocked_os_visibility INT,
+    OUT o_blocked_mute_friend_requests BOOLEAN,
+    OUT o_creation_time TIMESTAMP,
     OUT status INT
 )
 BEGIN
     DECLARE has_blocked BOOLEAN;
 
-    SELECT COUNT(*), creation_time INTO has_blocked, created
-    FROM quickfriends_player_blocked
-    WHERE player=player AND blocked=blocked;
+    SELECT COUNT(*), player.username, player.last_os, player.last_join_time, player.prefers_text, player.os_visibility, player.mute_friend_requests, blocked.username, blocked.last_os, blocked.last_join_time, blocked.prefers_text, blocked.os_visibility, blocked.mute_friend_requests, block.creation_time
+    INTO has_blocked, o_player_username, o_player_last_os, o_player_last_join_time, o_player_prefers_text, o_player_os_visibility, o_player_mute_friend_requests, o_blocked_username, o_blocked_last_os, o_blocked_last_join_time, o_blocked_prefers_text, o_blocked_os_visibility, o_blocked_mute_friend_requests, o_creation_time
+    FROM quickfriends_player_blocked block
+    INNER JOIN quickfriends_player_data player
+        ON player.uuid = block.player
+    INNER JOIN quickfriends_player_data blocked
+        ON blocked.uuid = block.blocked
+    WHERE player=i_player AND blocked=i_blocked
+    GROUP BY player.username, player.last_os, player.last_join_time, player.prefers_text, player.os_visibility, player.mute_friend_requests, blocked.username, blocked.last_os, blocked.last_join_time, blocked.prefers_text, blocked.os_visibility, blocked.mute_friend_requests, block.creation_time;
 
     IF has_blocked THEN
         SET status=-1;
         DELETE FROM quickfriends_player_blocked
-        WHERE player=player AND blocked=blocked;
+        WHERE player=i_player AND blocked=i_blocked;
     ELSE
         SET status=0;
     END IF;
@@ -403,8 +440,20 @@ START TRANSACTION;
 CALL remove_friend(
     :player1,
     :player2,
-    @requester,
-    @accepter,
+    @requester_uuid,
+    @requester_username,
+    @requester_last_os,
+    @requester_last_join_time,
+    @requester_prefers_text,
+    @requester_os_visibility,
+    @requester_mute_friend_requests,
+    @accepter_uuid,
+    @accepter_username,
+    @accepter_last_os,
+    @accepter_last_join_time,
+    @accepter_prefers_text,
+    @accepter_os_visibility,
+    @accepter_mute_friend_requests,
     @creation_time,
     @status
 );
@@ -412,14 +461,31 @@ CALL remove_friend(
 COMMIT;
 -- #&
 SELECT @status AS status,
-    @requester AS requester,
-    @accepter AS accepter,
+    @requester_uuid AS requester_uuid,
+    @requester_username AS requester_username,
+    @requester_last_os AS requester_last_os,
+    @requester_last_join_time AS requester_last_join_time,
+    @requester_prefers_text AS requester_prefers_text,
+    @requester_os_visibility AS requester_os_visibility,
+    @requester_mute_friend_requests AS requester_mute_friend_requests,
+    @accepter_uuid AS accepter_uuid,
+    @accepter_username AS accepter_username,
+    @accepter_last_os AS accepter_last_os,
+    @accepter_last_join_time AS accepter_last_join_time,
+    @accepter_prefers_text AS accepter_prefers_text,
+    @accepter_os_visibility AS accepter_os_visibility,
+    @accepter_mute_friend_requests AS accepter_mute_friend_requests,
     @creation_time AS creation_time;
 -- # }
 -- # { list_friends
 -- #     :uuid string
-SELECT * FROM quickfriends_player_friends
-WHERE requester=:uuid OR accepter=:uuid;
+SELECT friend.requester AS requester_uuid, friend.accepter AS accepter_uuid, requester.username AS requester_username, requester.last_os AS requester_last_os, requester.last_join_time AS requester_last_join_time, requester.prefers_text AS requester_prefers_text, requester.os_visibility AS requester_os_visibility, requester.mute_friend_requests AS requester_mute_friend_requests, accepter.uuid AS accepter_uuid, accepter.username AS accepter_username, accepter.last_os AS accepter_last_os, accepter.last_join_time AS accepter_last_join_time, accepter.prefers_text AS accepter_prefers_text, accepter.os_visibility AS accepter_os_visibility, accepter.mute_friend_requests AS accepter_mute_friend_requests, friend.creation_time AS creation_time
+FROM quickfriends_player_friends friend
+INNER JOIN quickfriends_player_data requester
+    ON requester.uuid = friend.requester
+INNER JOIN quickfriends_player_data accepter
+    ON accepter.uuid = friend.accepter
+WHERE friend.requester=:uuid OR friend.accepter=:uuid;
 -- # }
 -- # { add_block
 -- #     :player_uuid string
@@ -464,27 +530,69 @@ START TRANSACTION;
 CALL remove_block(
     :player,
     :blocked,
+    @player_username,
+    @player_last_os,
+    @player_last_join_time,
+    @player_prefers_text,
+    @player_os_visibility,
+    @player_mute_friend_requests,
+    @blocked_username,
+    @blocked_last_os,
+    @blocked_last_join_time,
+    @blocked_prefers_text,
+    @blocked_os_visibility,
+    @blocked_mute_friend_requests,
     @creation_time,
     @status
 );
 -- #&
 COMMIT;
 -- #&
-SELECT @status AS status, @creation_time AS creation_time;
+SELECT @status AS status,
+    :player AS player_uuid,
+    :blocked AS blocked_uuid,
+    @player_username AS player_username,
+    @player_last_os AS player_last_os,
+    @player_last_join_time AS player_last_join_time,
+    @player_prefers_text AS player_prefers_text,
+    @player_os_visibility AS player_os_visibility,
+    @player_mute_friend_requests AS player_mute_friend_requests,
+    @blocked_username AS blocked_username,
+    @blocked_last_os AS blocked_last_os,
+    @blocked_last_join_time AS blocked_last_join_time,
+    @blocked_prefers_text AS blocked_prefers_text,
+    @blocked_os_visibility AS blocked_os_visibility,
+    @blocked_mute_friend_requests AS blocked_mute_friend_requests,
+    @creation_time AS creation_time;
 -- # }
 -- # { get_blocks
 -- #     :uuids list:string
-SELECT * FROM quickfriends_player_friends
-WHERE player IN :uuids AND blocked IN :uuids;
+SELECT block.player AS player_uuid, block.blocked AS blocked_uuid, player.username AS player_username, player.last_os AS player_last_os, player.last_join_time AS player_last_join_time, player.prefers_text AS player_prefers_text, player.os_visibility AS player_os_visibility, player.mute_friend_requests AS player_mute_friend_requests, blocked.username AS blocked_username, blocked.last_os AS blocked_last_os, blocked.last_join_time AS blocked_last_join_time, blocked.prefers_text AS blocked_prefers_text, blocked.os_visibility AS blocked_os_visibility, blocked.mute_friend_requests AS blocked_mute_friend_requests, block.creation_time AS creation_time
+FROM quickfriends_player_blocked block
+INNER JOIN quickfriends_player_data player
+    ON player.uuid = block.player
+INNER JOIN quickfriends_player_data blocked
+    ON blocked.uuid = block.blocked
+WHERE block.player IN :uuids AND block.blocked IN :uuids;
 -- # }
 -- # { list_blocked
 -- #     :player string
-SELECT * FROM quickfriends_player_blocked
-WHERE player=:player;
+SELECT block.player AS player_uuid, block.blocked AS blocked_uuid, player.username AS player_username, player.last_os AS player_last_os, player.last_join_time AS player_last_join_time, player.prefers_text AS player_prefers_text, player.os_visibility AS player_os_visibility, player.mute_friend_requests AS player_mute_friend_requests, blocked.username AS blocked_username, blocked.last_os AS blocked_last_os, blocked.last_join_time AS blocked_last_join_time, blocked.prefers_text AS blocked_prefers_text, blocked.os_visibility AS blocked_os_visibility, blocked.mute_friend_requests AS blocked_mute_friend_requests, block.creation_time AS creation_time
+FROM quickfriends_player_blocked block
+INNER JOIN quickfriends_player_data player
+    ON player.uuid = block.player
+INNER JOIN quickfriends_player_data blocked
+    ON blocked.uuid = block.blocked
+WHERE block.player=:player;
 -- # }
 -- # { list_blocked_by
 -- #     :blocked string
-SELECT * FROM quickfriends_player_blocked
-WHERE blocked=:blocked;
+SELECT block.player AS player_uuid, block.blocked AS blocked_uuid, player.username AS player_username, player.last_os AS player_last_os, player.last_join_time AS player_last_join_time, player.prefers_text AS player_prefers_text, player.os_visibility AS player_os_visibility, player.mute_friend_requests AS player_mute_friend_requests, blocked.username AS blocked_username, blocked.last_os AS blocked_last_os, blocked.last_join_time AS blocked_last_join_time, blocked.prefers_text AS blocked_prefers_text, blocked.os_visibility AS blocked_os_visibility, blocked.mute_friend_requests AS blocked_mute_friend_requests, block.creation_time AS creation_time
+FROM quickfriends_player_blocked block
+INNER JOIN quickfriends_player_data player
+    ON player.uuid = block.player
+INNER JOIN quickfriends_player_data blocked
+    ON blocked.uuid = block.blocked
+WHERE block.blocked=:blocked;
 -- # }
 -- #}

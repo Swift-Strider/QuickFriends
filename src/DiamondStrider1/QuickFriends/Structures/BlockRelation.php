@@ -7,18 +7,18 @@ namespace DiamondStrider1\QuickFriends\Structures;
 final class BlockRelation
 {
     public function __construct(
-        private string $player,
-        private string $blocked,
+        private PlayerHandle $player,
+        private PlayerHandle $blocked,
         private int $creationTime,
     ) {
     }
 
-    public function player(): string
+    public function player(): PlayerHandle
     {
         return $this->player;
     }
 
-    public function blocked(): string
+    public function blocked(): PlayerHandle
     {
         return $this->blocked;
     }

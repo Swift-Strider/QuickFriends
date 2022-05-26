@@ -27,13 +27,6 @@ final class DatabaseConfig
     public static function parse(Parser $parser): ParsedValue
     {
         $type = $parser->rString('type');
-        $sqlite = $parser->traverse('sqlite');
-        $sqliteFile = $sqlite->rString('file');
-        $mysql = $parser->traverse('mysql');
-        $mysqlHost = $mysql->rString('host');
-        $mysqlUsername = $mysql->rString('username');
-        $mysqlPassword = $mysql->rString('password');
-        $mysqlSchema = $mysql->rString('schema');
         $workerLimit = $parser->rInt('worker-limit');
         $enableLogging = $parser->rBool('enable-logging');
 
@@ -45,20 +38,31 @@ final class DatabaseConfig
                 throw new ParseStopException();
             }
 
+            $settings = [
+                'type' => $type,
+                'worker-limit' => $workerLimit->take(),
+            ];
+
+            switch ($type) {
+                case 'sqlite':
+                    $sqlite = $parser->traverse('sqlite');
+                    $settings['sqlite'] = [
+                        'file' => $sqlite->rString('file')->take(),
+                    ];
+                    break;
+                case 'mysql':
+                    $mysql = $parser->traverse('mysql');
+                    $settings['mysql'] = [
+                        'host' => $mysql->rString('host')->take(),
+                        'username' => $mysql->rString('username')->take(),
+                        'password' => $mysql->rString('password')->take(),
+                        'schema' => $mysql->rString('schema')->take(),
+                    ];
+                    break;
+            }
+
             return ParsedValue::value(new self(
-                [
-                    'type' => $type,
-                    'sqlite' => [
-                        'file' => $sqliteFile->take(),
-                    ],
-                    'mysql' => [
-                        'host' => $mysqlHost->take(),
-                        'username' => $mysqlUsername->take(),
-                        'password' => $mysqlPassword->take(),
-                        'schema' => $mysqlSchema->take(),
-                    ],
-                    'worker-limit' => $workerLimit->take(),
-                ],
+                $settings,
                 $type,
                 $enableLogging->take()
             ));

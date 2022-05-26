@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace DiamondStrider1\QuickFriends\Database;
 
-use DiamondStrider1\QuickFriends\Structures\BlockRelation;
-use DiamondStrider1\QuickFriends\Structures\Friendship;
 use DiamondStrider1\QuickFriends\Structures\PlayerData;
 use DiamondStrider1\QuickFriends\Structures\PlayerHandle;
 use DiamondStrider1\QuickFriends\Structures\UserPreferences;
@@ -46,19 +44,9 @@ final class MySqlDatabase implements Database
             return null;
         }
 
-        $lastJoinTime = $row['last_join_time'];
-        if (is_string($lastJoinTime)) {
-            $lastJoinTime = strtotime($lastJoinTime);
-        }
+        $row['uuid'] = $player;
 
-        return new PlayerData(
-            $row['username'],
-            $row['last_os'],
-            $lastJoinTime,
-            (bool) $row['prefers_text'],
-            $row['os_visibility'],
-            (bool) $row['mute_friend_requests'],
-        );
+        return StructureParser::parsePlayerData($row);
     }
 
     public function touchPlayerData(
@@ -182,20 +170,15 @@ final class MySqlDatabase implements Database
             throw new LogicException('The variable $rows is not an array!');
         }
 
-        $code = $rows[0]['status'] ?? null;
+        $row = $rows[0] ?? null;
+        if (!is_array($row)) {
+            throw new LogicException('The variable $row is not an array!');
+        }
+
+        $code = $row['status'] ?? null;
 
         if (-1 === $code) {
-            $requester = $rows[0]['requester'];
-            $accepter = $rows[0]['accepter'];
-            $creationTime = $rows[0]['creation_time'];
-            if (is_string($creationTime)) {
-                $creationTime = strtotime($creationTime);
-            }
-            if (null === $creationTime || !is_int($creationTime)) {
-                throw new LogicException('creation_time should have been set because status was set to -1 (a.k.a unfriend successful), but it was set to '.print_r($creationTime, true));
-            }
-
-            return new Friendship($requester, $accepter, $creationTime);
+            return StructureParser::parseFriendship($row);
         }
 
         if (null === $code || !is_int($code) || !Codes::validUnfriend($code)) {
@@ -219,15 +202,7 @@ final class MySqlDatabase implements Database
 
         $friendships = [];
         foreach ($rows as $row) {
-            $creationTime = $row['creation_time'];
-            if (is_string($creationTime)) {
-                $creationTime = strtotime($creationTime);
-            }
-            $friendships[] = new Friendship(
-                $row['requester'],
-                $row['accepter'],
-                $creationTime,
-            );
+            $friendships[] = StructureParser::parseFriendship($row);
         }
 
         return $friendships;
@@ -283,19 +258,15 @@ final class MySqlDatabase implements Database
         if (!is_array($rows)) {
             throw new LogicException('The variable $rows is not an array!');
         }
+        $row = $rows[0] ?? null;
+        if (!is_array($row)) {
+            throw new LogicException('The variable $row is not an array!');
+        }
 
-        $code = $rows[0]['status'] ?? null;
+        $code = $row['status'] ?? null;
 
         if (-1 === $code) {
-            $creationTime = $rows[0]['creation_time'];
-            if (is_string($creationTime)) {
-                $creationTime = strtotime($creationTime);
-            }
-            if (null === $creationTime || !is_int($creationTime)) {
-                throw new LogicException('creation_time should have been set because status was set to -1 (a.k.a unblock successful), but it was set to '.print_r($creationTime, true));
-            }
-
-            return new BlockRelation($player, $blocked, $creationTime);
+            return StructureParser::parseBlockRelation($row);
         }
 
         if (null === $code || !is_int($code) || !Codes::validUnblock($code)) {
@@ -325,11 +296,7 @@ final class MySqlDatabase implements Database
             if (is_string($creationTime)) {
                 $creationTime = strtotime($creationTime);
             }
-            $blocks[] = new BlockRelation(
-                $row['player'],
-                $row['blocked'],
-                $creationTime,
-            );
+            $blocks[] = StructureParser::parseBlockRelation($row);
         }
 
         return $blocks;
@@ -349,15 +316,7 @@ final class MySqlDatabase implements Database
 
         $blocks = [];
         foreach ($rows as $row) {
-            $creationTime = $row['creation_time'];
-            if (is_string($creationTime)) {
-                $creationTime = strtotime($creationTime);
-            }
-            $blocks[] = new BlockRelation(
-                $row['player'],
-                $row['blocked'],
-                $creationTime,
-            );
+            $blocks[] = StructureParser::parseBlockRelation($row);
         }
 
         return $blocks;
@@ -381,11 +340,7 @@ final class MySqlDatabase implements Database
             if (is_string($creationTime)) {
                 $creationTime = strtotime($creationTime);
             }
-            $blocks[] = new BlockRelation(
-                $row['player'],
-                $row['blocked'],
-                $creationTime,
-            );
+            $blocks[] = StructureParser::parseBlockRelation($row);
         }
 
         return $blocks;

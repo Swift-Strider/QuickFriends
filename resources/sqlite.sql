@@ -118,12 +118,22 @@ WHERE requester IN :uuids AND accepter IN :uuids;
 -- # }
 -- # { list_friends
 -- #     :uuid string
-SELECT * FROM quickfriends_player_friends
+SELECT friend.requester AS requester_uuid, friend.accepter AS accepter_uuid, requester.username AS requester_username, requester.last_os AS requester_last_os, requester.last_join_time AS requester_last_join_time, requester.prefers_text AS requester_prefers_text, requester.os_visibility AS requester_os_visibility, requester.mute_friend_requests AS requester_mute_friend_requests, accepter.uuid AS accepter_uuid, accepter.username AS accepter_username, accepter.last_os AS accepter_last_os, accepter.last_join_time AS accepter_last_join_time, accepter.prefers_text AS accepter_prefers_text, accepter.os_visibility AS accepter_os_visibility, accepter.mute_friend_requests AS accepter_mute_friend_requests, friend.creation_time AS creation_time
+FROM quickfriends_player_friends friend
+INNER JOIN quickfriends_player_data requester
+    ON requester.uuid = friend.requester
+INNER JOIN quickfriends_player_data accepter
+    ON accepter.uuid = friend.accepter
 WHERE requester=:uuid OR accepter=:uuid;
 -- # }
 -- # { get_friendship
 -- #     :uuids list:string
-SELECT * FROM quickfriends_player_friends
+SELECT friend.requester AS requester_uuid, friend.accepter AS accepter_uuid, requester.username AS requester_username, requester.last_os AS requester_last_os, requester.last_join_time AS requester_last_join_time, requester.prefers_text AS requester_prefers_text, requester.os_visibility AS requester_os_visibility, requester.mute_friend_requests AS requester_mute_friend_requests, accepter.uuid AS accepter_uuid, accepter.username AS accepter_username, accepter.last_os AS accepter_last_os, accepter.last_join_time AS accepter_last_join_time, accepter.prefers_text AS accepter_prefers_text, accepter.os_visibility AS accepter_os_visibility, accepter.mute_friend_requests AS accepter_mute_friend_requests, friend.creation_time AS creation_time
+FROM quickfriends_player_friends friend
+INNER JOIN quickfriends_player_data requester
+    ON requester.uuid = friend.requester
+INNER JOIN quickfriends_player_data accepter
+    ON accepter.uuid = friend.accepter
 WHERE requester IN :uuids AND accepter IN :uuids;
 -- # }
 -- # { add_block
@@ -167,17 +177,32 @@ WHERE player=:player AND blocked=:blocked;
 -- # }
 -- # { get_blocks
 -- #     :uuids list:string
-SELECT * FROM quickfriends_player_blocked
-WHERE player IN :uuids AND blocked IN :uuids;
+SELECT block.player AS player_uuid, block.blocked AS blocked_uuid, player.username AS player_username, player.last_os AS player_last_os, player.last_join_time AS player_last_join_time, player.prefers_text AS player_prefers_text, player.os_visibility AS player_os_visibility, player.mute_friend_requests AS player_mute_friend_requests, blocked.username AS blocked_username, blocked.last_os AS blocked_last_os, blocked.last_join_time AS blocked_last_join_time, blocked.prefers_text AS blocked_prefers_text, blocked.os_visibility AS blocked_os_visibility, blocked.mute_friend_requests AS blocked_mute_friend_requests, block.creation_time AS creation_time
+FROM quickfriends_player_blocked block
+INNER JOIN quickfriends_player_data player
+    ON player.uuid = block.player
+INNER JOIN quickfriends_player_data blocked
+    ON blocked.uuid = block.blocked
+WHERE block.player IN :uuids AND block.blocked IN :uuids;
 -- # }
 -- # { list_blocked
--- #     :uuid string
-SELECT * FROM quickfriends_player_blocked
-WHERE player=:uuid;
+-- #     :player string
+SELECT block.player AS player_uuid, block.blocked AS blocked_uuid, player.username AS player_username, player.last_os AS player_last_os, player.last_join_time AS player_last_join_time, player.prefers_text AS player_prefers_text, player.os_visibility AS player_os_visibility, player.mute_friend_requests AS player_mute_friend_requests, blocked.username AS blocked_username, blocked.last_os AS blocked_last_os, blocked.last_join_time AS blocked_last_join_time, blocked.prefers_text AS blocked_prefers_text, blocked.os_visibility AS blocked_os_visibility, blocked.mute_friend_requests AS blocked_mute_friend_requests, block.creation_time AS creation_time
+FROM quickfriends_player_blocked block
+INNER JOIN quickfriends_player_data player
+    ON player.uuid = block.player
+INNER JOIN quickfriends_player_data blocked
+    ON blocked.uuid = block.blocked
+WHERE block.player=:player;
 -- # }
 -- # { list_blocked_by
--- #     :uuid string
-SELECT * FROM quickfriends_player_blocked
-WHERE blocked=:uuid;
+-- #     :blocked string
+SELECT block.player AS player_uuid, block.blocked AS blocked_uuid, player.username AS player_username, player.last_os AS player_last_os, player.last_join_time AS player_last_join_time, player.prefers_text AS player_prefers_text, player.os_visibility AS player_os_visibility, player.mute_friend_requests AS player_mute_friend_requests, blocked.username AS blocked_username, blocked.last_os AS blocked_last_os, blocked.last_join_time AS blocked_last_join_time, blocked.prefers_text AS blocked_prefers_text, blocked.os_visibility AS blocked_os_visibility, blocked.mute_friend_requests AS blocked_mute_friend_requests, block.creation_time AS creation_time
+FROM quickfriends_player_blocked block
+INNER JOIN quickfriends_player_data player
+    ON player.uuid = block.player
+INNER JOIN quickfriends_player_data blocked
+    ON blocked.uuid = block.blocked
+WHERE block.blocked=:blocked;
 -- # }
 -- #}

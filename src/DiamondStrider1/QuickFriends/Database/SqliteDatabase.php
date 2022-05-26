@@ -50,19 +50,9 @@ final class SqliteDatabase implements Database
             return null;
         }
 
-        $lastJoinTime = $row['last_join_time'];
-        if (is_string($lastJoinTime)) {
-            $lastJoinTime = strtotime($lastJoinTime);
-        }
+        $row['uuid'] = $player;
 
-        return new PlayerData(
-            $row['username'],
-            $row['last_os'],
-            $lastJoinTime,
-            (bool) $row['prefers_text'],
-            $row['os_visibility'],
-            (bool) $row['mute_friend_requests'],
-        );
+        return StructureParser::parsePlayerData($row);
     }
 
     public function touchPlayerData(
@@ -115,7 +105,7 @@ final class SqliteDatabase implements Database
         $blocks = yield from $this->getBlockRelations($requester->uuid(), $receiver->uuid());
         $isBlockedBy = false;
         foreach ($blocks as $block) {
-            if ($block->player() === $requester->uuid()) {
+            if ($block->player()->uuid() === $requester->uuid()) {
                 $this->lock->release();
 
                 return Codes::REQUEST_BLOCKED;
@@ -129,13 +119,13 @@ final class SqliteDatabase implements Database
             return Codes::REQUEST_BLOCKED_BY;
         }
 
-        $rows = (yield from Await::promise(
+        $rows = yield from Await::promise(
             function ($resolve, $reject) use ($requester, $receiver) {
                 $this->db->executeSelect('quickfriends.get_friendship', [
                     'uuids' => [$requester->uuid(), $receiver->uuid()],
                 ], $resolve, $reject);
             }
-        ));
+        );
 
         if (!is_array($rows)) {
             throw new LogicException('The variable $rows is not an array!');
@@ -185,8 +175,8 @@ final class SqliteDatabase implements Database
         $aUuid = $accepter->uuid();
         foreach ($friendships as $f) {
             if (
-                $f->requester() === $rUuid && $f->accepter() === $aUuid ||
-                $f->requester() === $aUuid && $f->accepter() === $rUuid
+                $f->requester()->uuid() === $rUuid && $f->accepter()->uuid() === $aUuid ||
+                $f->requester()->uuid() === $aUuid && $f->accepter()->uuid() === $rUuid
             ) {
                 $this->lock->release();
 
@@ -257,14 +247,7 @@ final class SqliteDatabase implements Database
 
         $row = $rows[0] ?? null;
         if (null !== $row) {
-            $creationTime = $row['creation_time'];
-            if (is_string($creationTime)) {
-                $creationTime = strtotime($creationTime);
-            }
-
-            return new Friendship(
-                $row['requester'], $row['accepter'], $creationTime
-            );
+            return StructureParser::parseFriendship($row);
         }
 
         return Codes::UNFRIEND_NOT_FRIENDS;
@@ -284,15 +267,7 @@ final class SqliteDatabase implements Database
 
         $friendships = [];
         foreach ($rows as $row) {
-            $creationTime = $row['creation_time'];
-            if (is_string($creationTime)) {
-                $creationTime = strtotime($creationTime);
-            }
-            $friendships[] = new Friendship(
-                $row['requester'],
-                $row['accepter'],
-                $creationTime,
-            );
+            $friendships[] = StructureParser::parseFriendship($row);
         }
 
         return $friendships;
@@ -309,7 +284,9 @@ final class SqliteDatabase implements Database
         $pUuid = $player->uuid();
         $bUuid = $blocked->uuid();
         foreach ($blocks as $block) {
-            if ($block->player() === $pUuid && $block->blocked() === $bUuid) {
+            if ($block->player()->uuid() === $pUuid &&
+                $block->blocked()->uuid() === $bUuid
+            ) {
                 $this->lock->release();
 
                 return Codes::BLOCK_ALREADY_BLOCKED;
@@ -362,14 +339,7 @@ final class SqliteDatabase implements Database
 
         $row = $rows[0] ?? null;
         if (null !== $row) {
-            $creationTime = $row['creation_time'];
-            if (is_string($creationTime)) {
-                $creationTime = strtotime($creationTime);
-            }
-
-            return new BlockRelation(
-                $player, $blocked, $creationTime
-            );
+            return StructureParser::parseBlockRelation($row);
         }
 
         return Codes::UNFRIEND_NOT_FRIENDS;
@@ -408,15 +378,7 @@ final class SqliteDatabase implements Database
 
         $blocks = [];
         foreach ($rows as $row) {
-            $creationTime = $row['creation_time'];
-            if (is_string($creationTime)) {
-                $creationTime = strtotime($creationTime);
-            }
-            $blocks[] = new BlockRelation(
-                $row['player'],
-                $row['blocked'],
-                $creationTime,
-            );
+            $blocks[] = StructureParser::parseBlockRelation($row);
         }
 
         return $blocks;

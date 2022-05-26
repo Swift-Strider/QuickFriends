@@ -7,18 +7,18 @@ namespace DiamondStrider1\QuickFriends\Structures;
 final class Friendship
 {
     public function __construct(
-        private string $requester,
-        private string $accepter,
+        private PlayerHandle $requester,
+        private PlayerHandle $accepter,
         private int $creationTime,
     ) {
     }
 
-    public function requester(): string
+    public function requester(): PlayerHandle
     {
         return $this->requester;
     }
 
-    public function accepter(): string
+    public function accepter(): PlayerHandle
     {
         return $this->accepter;
     }

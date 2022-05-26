@@ -80,7 +80,7 @@ final class SocialPlayerApi
             }
             if (Codes::FRIEND_NOW_FRIENDS === $code) {
                 (new FriendAddedEvent(new Friendship(
-                    $receiver->uuid(), $requester->uuid(), $friendTime,
+                    $receiver, $requester, $friendTime,
                 )))->call();
             }
 
@@ -115,7 +115,7 @@ final class SocialPlayerApi
 
         $expireTime = $this->socialRuntime->addFriendRequest(
             $request = new FriendRequest(
-                $requester->uuid(), $receiver->uuid(), microtime(true)
+                $requester, $receiver, microtime(true)
             )
         );
 
@@ -160,7 +160,7 @@ final class SocialPlayerApi
         };
         if (null !== $alsoUnfriended) {
             (new PlayerBlockedEvent(
-                new BlockRelation($player->uuid(), $blocked->uuid(), $blockedTime),
+                new BlockRelation($player, $blocked, $blockedTime),
                 $alsoUnfriended,
             ));
         }
