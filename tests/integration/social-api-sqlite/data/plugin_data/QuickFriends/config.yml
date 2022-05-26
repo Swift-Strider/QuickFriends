@@ -1,3 +1,6 @@
+language:
+  default-language: en_US
+
 social:
   friend-request-duration: 60
   max-friend-limit: 1

@@ -1,3 +1,6 @@
+language:
+  default-language: en_US
+
 social:
   # Time in seconds before a friend request expires.
   friend-request-duration: 60
