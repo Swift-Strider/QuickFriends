@@ -170,10 +170,11 @@ final class SqliteDatabase implements Database
         yield from $this->lock->acquire();
         yield from $this->_removeBlockRelation($requester->uuid(), $accepter->uuid());
         yield from $this->_removeBlockRelation($accepter->uuid(), $requester->uuid());
-        $friendships = yield from $this->listFriends($requester->uuid());
+        $rFriendships = yield from $this->listFriends($requester->uuid());
+        $aFriendships = yield from $this->listFriends($requester->uuid());
         $rUuid = $requester->uuid();
         $aUuid = $accepter->uuid();
-        foreach ($friendships as $f) {
+        foreach ($rFriendships as $f) {
             if (
                 $f->requester()->uuid() === $rUuid && $f->accepter()->uuid() === $aUuid ||
                 $f->requester()->uuid() === $aUuid && $f->accepter()->uuid() === $rUuid
@@ -184,10 +185,16 @@ final class SqliteDatabase implements Database
             }
         }
 
-        if (count($friendships) >= $maxFriends) {
+        if (count($rFriendships) >= $maxFriends) {
             $this->lock->release();
 
-            return Codes::FRIEND_LIMIT_REACHED;
+            return Codes::FRIEND_REQUESTER_LIMIT_REACHED;
+        }
+
+        if (count($aFriendships) >= $maxFriends) {
+            $this->lock->release();
+
+            return Codes::FRIEND_ACCEPTER_LIMIT_REACHED;
         }
 
         yield from Await::promise(function ($resolve, $reject) use ($requester, $accepter, $creationTime, $defaultPreferences) {

@@ -15,7 +15,8 @@ final class Codes
 
     public const FRIEND_NOW_FRIENDS = 0;
     public const FRIEND_ALREADY_FRIENDS = 1;
-    public const FRIEND_LIMIT_REACHED = 2;
+    public const FRIEND_REQUESTER_LIMIT_REACHED = 2;
+    public const FRIEND_ACCEPTER_LIMIT_REACHED = 3;
 
     public const UNFRIEND_NOT_FRIENDS = 0;
 
@@ -42,7 +43,7 @@ final class Codes
 
     public static function validBlock(int $code): bool
     {
-        return $code >= 0 && $code <= 3;
+        return $code >= 0 && $code <= 2;
     }
 
     public static function validUnblock(int $code): bool

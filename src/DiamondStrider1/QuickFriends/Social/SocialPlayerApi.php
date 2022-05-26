@@ -28,6 +28,7 @@ final class SocialPlayerApi
     public const FRIEND_RESULT_BLOCKED_BY = 4;
     public const FRIEND_RESULT_ALREADY_FRIENDS = 5;
     public const FRIEND_RESULT_LIMIT_REACHED = 6;
+    public const FRIEND_RESULT_OTHER_LIMIT_REACHED = 7;
 
     public const UNFRIEND_RESULT_NOW_REMOVED = 0;
     public const UNFRIEND_RESULT_NOT_FRIENDS = 1;
@@ -75,7 +76,10 @@ final class SocialPlayerApi
                 $this->userPreferencesConfig->defaultPreferences(),
                 $this->socialConfig->maxFriendLimit()
             );
-            if (Codes::FRIEND_LIMIT_REACHED !== $code) {
+            if (
+                Codes::FRIEND_REQUESTER_LIMIT_REACHED !== $code &&
+                Codes::FRIEND_ACCEPTER_LIMIT_REACHED !== $code
+            ) {
                 $this->socialRuntime->removeFriendRequest($receiver->uuid(), $requester->uuid());
             }
             if (Codes::FRIEND_NOW_FRIENDS === $code) {
@@ -87,7 +91,8 @@ final class SocialPlayerApi
             return match ($code) {
                 Codes::FRIEND_NOW_FRIENDS => self::FRIEND_RESULT_NOW_FRIENDS,
                 Codes::FRIEND_ALREADY_FRIENDS => self::FRIEND_RESULT_ALREADY_FRIENDS,
-                Codes::FRIEND_LIMIT_REACHED => self::FRIEND_RESULT_LIMIT_REACHED,
+                Codes::FRIEND_REQUESTER_LIMIT_REACHED => self::FRIEND_RESULT_OTHER_LIMIT_REACHED,
+                Codes::FRIEND_ACCEPTER_LIMIT_REACHED => self::FRIEND_RESULT_LIMIT_REACHED,
             };
         }
 

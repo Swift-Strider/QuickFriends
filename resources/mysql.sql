@@ -132,7 +132,8 @@ CREATE PROCEDURE add_friend(
 )
 BEGIN
     DECLARE are_friends BOOLEAN;
-    DECLARE num_friends INT;
+    DECLARE requester_friend_count INT;
+    DECLARE accepter_friend_count INT;
 
     INSERT INTO quickfriends_player_data (
     uuid, username, last_os, last_join_time,
@@ -160,13 +161,18 @@ BEGIN
     WHERE requester IN (requester_uuid, accepter_uuid)
         AND accepter IN (requester_uuid, accepter_uuid);
 
-    SELECT COUNT(*) INTO num_friends FROM quickfriends_player_friends
-    WHERE requester=requester_uuid OR accepter=accepter_uuid;
+    SELECT COUNT(*) INTO requester_friend_count FROM quickfriends_player_friends
+    WHERE requester=requester_uuid OR accepter=requester_uuid;
+
+    SELECT COUNT(*) INTO accepter_friend_count FROM quickfriends_player_friends
+    WHERE requester=accepter_uuid OR accepter=accepter_uuid;
 
     IF are_friends THEN
         SET status=1;
-    ELSEIF num_friends >= max_friends THEN
+    ELSEIF requester_friend_count >= max_friends THEN
         SET status=2;
+    ELSEIF accepter_friend_count >= max_friends THEN
+        SET status=3;
     ELSE
         SET status=0;
         INSERT INTO quickfriends_player_friends

@@ -92,7 +92,7 @@ final class MainModule implements Module
             $code = yield from $api->addFriend($second, $first);
             T::assert($code === SocialPlayerApi::FRIEND_RESULT_NOW_FRIENDS, "Expected FRIEND_RESULT_NOW_FRIENDS", $code);
             $code = yield from $api->addFriend($third, $first);
-            T::assert($code === SocialPlayerApi::FRIEND_RESULT_LIMIT_REACHED, "Expected FRIEND_RESULT_LIMIT_REACHED", $code);
+            T::assert($code === SocialPlayerApi::FRIEND_RESULT_OTHER_LIMIT_REACHED, "Expected FRIEND_RESULT_OTHER_LIMIT_REACHED", $code);
 
             $logger->alert('Test Successful!');
 
