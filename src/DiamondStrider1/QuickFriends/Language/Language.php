@@ -11,6 +11,10 @@ final class Language
     public function __construct(
         private string $friend_request_sent,
         private string $friend_request_received,
+        private string $friend_added,
+        private string $friend_removed,
+        private string $player_blocked,
+        private string $player_unblocked,
     ) {
     }
 
@@ -18,12 +22,20 @@ final class Language
     {
         $friend_request_sent = $p->rString('friend_request_sent');
         $friend_request_received = $p->rString('friend_request_received');
+        $friend_added = $p->rString('friend_added');
+        $friend_removed = $p->rString('friend_removed');
+        $player_blocked = $p->rString('player_blocked');
+        $player_unblocked = $p->rString('player_unblocked');
 
         $p->check();
 
         return new self(
             $friend_request_sent->take(),
             $friend_request_received->take(),
+            $friend_added->take(),
+            $friend_removed->take(),
+            $player_blocked->take(),
+            $player_unblocked->take(),
         );
     }
 
@@ -42,6 +54,42 @@ final class Language
             ['%sender%', '%expire_time%'],
             [$sender, $expireTime],
             $this->friend_request_received
+        );
+    }
+
+    public function friend_added(string $other): string
+    {
+        return str_replace(
+            '%other%',
+            $other,
+            $this->friend_added
+        );
+    }
+
+    public function friend_removed(string $other): string
+    {
+        return str_replace(
+            '%other%',
+            $other,
+            $this->friend_removed
+        );
+    }
+
+    public function player_blocked(string $other): string
+    {
+        return str_replace(
+            '%other%',
+            $other,
+            $this->player_blocked
+        );
+    }
+
+    public function player_unblocked(string $other): string
+    {
+        return str_replace(
+            '%other%',
+            $other,
+            $this->player_unblocked
         );
     }
 }

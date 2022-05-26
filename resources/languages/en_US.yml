@@ -1,0 +1,21 @@
+# This is the en_US language file!
+
+# If you change this file, you must set
+# keep_file_edits to true.
+# Otherwise this file WILL be overwritten if
+# errors are found, or when the plugin updates
+# (and has more new messages).
+keep_file_edits: false
+
+friend_request_sent: |
+  You sent a friend request to %receiver%! Expires in %expire_time%!
+friend_request_received: |
+  %sender% sent you a friend request that expires in %expire_time%!
+friend_added: |
+  You are now friends with %other%!
+friend_removed: |
+  You are no longer friends with d%other%.
+player_blocked: |
+  You have blocked %other%.
+player_unblocked: |
+  You have unblocked %other%.

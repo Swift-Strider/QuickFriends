@@ -56,38 +56,19 @@ final class LanguageModule implements Module
             return $lang;
         }
 
-        $this->plugin->saveResource("languages/$locale.lang");
-        $file = $this->plugin->getDataFolder()."languages/$locale.lang";
-        $contents = file_get_contents($file);
-        if (false === $contents) {
-            $this->logger->error("Error reading language file: $file");
-            $this->logger->error('file_get_contents(...) returned false!');
+        $this->plugin->saveResource("languages/$locale.yml");
+        $file = $this->plugin->getDataFolder()."languages/$locale.yml";
+
+        $entries = yaml_parse_file($file);
+        if (!is_array($entries)) {
+            $this->logger->emergency("The language file is corrupted: $file");
 
             return null;
-        }
-        $lines = preg_split('/\r?\n/', $contents);
-        if (false === $lines) {
-            $this->logger->error("Error parsing language file: $file");
-            $this->logger->error('preg_split(...) returned false!');
-
-            return null;
-        }
-
-        $entries = [];
-        foreach ($lines as $line) {
-            if (str_starts_with($line, '#')) {
-                continue;
-            }
-            $components = explode('=', $line, 2);
-            if (2 !== count($components)) {
-                continue;
-            }
-            $entries[$components[0]] = $components[1];
         }
 
         $parser = new Parser(
             $entries,
-            "%error_count% error(s) in languages/$locale.lang",
+            "%error_count% error(s) in languages/$locale.yml",
             '%error_count% error(s) in %element_name%'
         );
         try {
@@ -95,7 +76,7 @@ final class LanguageModule implements Module
         } catch (ParseStopException $e) {
             if (
                 $returnNullOnError ||
-                ($entries['keep_file_edits'] ?? null) === 'true'
+                ($entries['keep_file_edits'] ?? null) === true
             ) {
                 $message = $parser->generateErrorMessage();
                 $this->logger->emergency("Failed to load language file, details below...\n$message");
@@ -103,7 +84,7 @@ final class LanguageModule implements Module
                 return null;
             }
 
-            $this->plugin->saveResource("languages/$locale.lang", true);
+            $this->plugin->saveResource("languages/$locale.yml", true);
 
             return $this->getLocaleLanguage($locale, true);
         }
