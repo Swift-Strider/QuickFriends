@@ -167,7 +167,7 @@ final class SocialPlayerApi
             (new PlayerBlockedEvent(
                 new BlockRelation($player, $blocked, $blockedTime),
                 $alsoUnfriended,
-            ));
+            ))->call();
         }
 
         return match ($code) {
