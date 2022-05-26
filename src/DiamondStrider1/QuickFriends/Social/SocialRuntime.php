@@ -33,32 +33,14 @@ final class SocialRuntime
         private SocialConfig $socialConfig,
         private PluginBase $plugin,
     ) {
+        foreach ($plugin->getServer()->getOnlinePlayers() as $p) {
+            $this->onPlayerJoin($p);
+        }
         $pluginManager = $plugin->getServer()->getPluginManager();
         $pluginManager->registerEvent(
             PlayerJoinEvent::class,
             function (PlayerJoinEvent $ev) {
-                $time = time();
-                $uuid = $ev->getPlayer()->getUniqueId()->getHex()->toString();
-                $username = $ev->getPlayer()->getName();
-                $os = $ev->getPlayer()->getPlayerInfo()->getExtraData()['DeviceOS'];
-                $os = match ($os) {
-                    DeviceOS::ANDROID => 'Android',
-                    DeviceOS::IOS => 'iOS',
-                    DeviceOS::OSX => 'Apple Mac',
-                    DeviceOS::AMAZON => 'Amazon',
-                    DeviceOS::GEAR_VR => 'Gear VR',
-                    DeviceOS::HOLOLENS => 'Hololens',
-                    DeviceOS::WINDOWS_10 => 'Windows 10',
-                    DeviceOS::WIN32 => 'Win32',
-                    DeviceOS::DEDICATED => 'Dedicated',
-                    DeviceOS::TVOS => 'TVOS',
-                    DeviceOS::PLAYSTATION => 'PlayStation',
-                    DeviceOS::NINTENDO => 'Nintendo',
-                    DeviceOS::XBOX => 'XBox',
-                    DeviceOS::WINDOWS_PHONE => 'Windows Phone',
-                    default => '<unknown>',
-                };
-                $this->handles[$uuid] = new PlayerHandle($uuid, $username, $os, $time);
+                $this->onPlayerJoin($ev->getPlayer());
             },
             EventPriority::LOWEST, $plugin, true
         );
@@ -75,6 +57,32 @@ final class SocialRuntime
             },
             EventPriority::MONITOR, $plugin, true
         );
+    }
+
+    private function onPlayerJoin(Player $player): void
+    {
+        $time = time();
+        $uuid = $player->getUniqueId()->getHex()->toString();
+        $username = $player->getName();
+        $os = $player->getPlayerInfo()->getExtraData()['DeviceOS'];
+        $os = match ($os) {
+            DeviceOS::ANDROID => 'Android',
+            DeviceOS::IOS => 'iOS',
+            DeviceOS::OSX => 'Apple Mac',
+            DeviceOS::AMAZON => 'Amazon',
+            DeviceOS::GEAR_VR => 'Gear VR',
+            DeviceOS::HOLOLENS => 'Hololens',
+            DeviceOS::WINDOWS_10 => 'Windows 10',
+            DeviceOS::WIN32 => 'Win32',
+            DeviceOS::DEDICATED => 'Dedicated',
+            DeviceOS::TVOS => 'TVOS',
+            DeviceOS::PLAYSTATION => 'PlayStation',
+            DeviceOS::NINTENDO => 'Nintendo',
+            DeviceOS::XBOX => 'XBox',
+            DeviceOS::WINDOWS_PHONE => 'Windows Phone',
+            default => '<unknown>',
+        };
+        $this->handles[$uuid] = new PlayerHandle($uuid, $username, $os, $time);
     }
 
     public function addFriendRequest(FriendRequest $friendRequest): int
