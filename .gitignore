@@ -7,3 +7,6 @@
 
 # PHP CS Fixer
 .php-cs-fixer.cache
+
+# Misc
+/build/

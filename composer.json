@@ -20,7 +20,11 @@
             "composer install"
         ],
         "fmt": "tools/php-cs-fixer/vendor/bin/php-cs-fixer fix --config=tools/php-cs-fixer/.php-cs-fixer.php",
-        "phpstan": "tools/phpstan/vendor/bin/phpstan analyze -c tools/phpstan/phpstan.neon"
+        "phpstan": "tools/phpstan/vendor/bin/phpstan analyze -c tools/phpstan/phpstan.neon",
+        "integration-test": [
+            "Composer\\Config::disableProcessTimeout",
+            "php tools/integration-test/integration-test.php"
+        ]
     },
 
     "config": {

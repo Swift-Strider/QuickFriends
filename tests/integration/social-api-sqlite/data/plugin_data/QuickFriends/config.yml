@@ -1,0 +1,25 @@
+social:
+  friend-request-duration: 60
+  max-friend-limit: 1
+  joinable-worlds:
+    enable-block-list: false
+    worlds:
+      - world
+      - lobby
+
+preferences:
+  # Every user has their own preference settings,
+  # the default preferences are given to new players.
+  default-preferences:
+    # Wether to disable forms
+    prefers-text: false
+    # May be "everyone", "friends", or "nobody"
+    os-visibility: everyone
+    mute-friend-requests: false
+
+database:
+  type: sqlite
+  sqlite:
+    file: data.sqlite
+  worker-limit: 1
+  enable-logging: false

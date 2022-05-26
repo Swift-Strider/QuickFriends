@@ -44,3 +44,22 @@ jobs:
       - name: php-cs-fixer run
         run: |
           composer run fmt -- --dry-run
+  integration-tests:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php-version:
+          - "8.0.19"
+    steps:
+      - uses: actions/checkout@v2
+      - uses: pmmp/setup-php-action@247e08acd52c1465f8f144c162c88f079d8c1174
+        with:
+          php-version: ${{ matrix.php-version }}
+          install-path: "./bin"
+      - name: Composer Install
+        run: |
+          composer install --ignore-platform-reqs
+      - name: php integration-test.php
+        run: |
+          composer run integration-test

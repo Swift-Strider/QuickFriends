@@ -1,0 +1,6 @@
+#!/bin/sh
+
+while ! mysqladmin ping -u username --password="password" --silent 2>/dev/null;
+do
+    sleep 1;
+done
