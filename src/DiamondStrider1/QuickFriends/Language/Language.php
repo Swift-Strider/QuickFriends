@@ -13,6 +13,7 @@ final class Language
         private string $friend_request_received,
         private string $friend_added,
         private string $friend_removed,
+        private string $player_blocked_and_unfriended,
         private string $player_blocked,
         private string $player_unblocked,
     ) {
@@ -24,6 +25,7 @@ final class Language
         $friend_request_received = $p->rString('friend_request_received');
         $friend_added = $p->rString('friend_added');
         $friend_removed = $p->rString('friend_removed');
+        $player_blocked_and_unfriended = $p->rString('player_blocked_and_unfriended');
         $player_blocked = $p->rString('player_blocked');
         $player_unblocked = $p->rString('player_unblocked');
 
@@ -34,6 +36,7 @@ final class Language
             $friend_request_received->take(),
             $friend_added->take(),
             $friend_removed->take(),
+            $player_blocked_and_unfriended->take(),
             $player_blocked->take(),
             $player_unblocked->take(),
         );
@@ -81,6 +84,15 @@ final class Language
             '%other%',
             $other,
             $this->player_blocked
+        );
+    }
+
+    public function player_blocked_and_unfriended(string $other): string
+    {
+        return str_replace(
+            '%other%',
+            $other,
+            $this->player_blocked_and_unfriended
         );
     }
 

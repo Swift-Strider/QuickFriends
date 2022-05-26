@@ -15,6 +15,8 @@ friend_added: |
   You are now friends with %other%!
 friend_removed: |
   You are no longer friends with %other%.
+player_blocked_and_unfriended: |
+  You have blocked and are no longer friends with %other%.
 player_blocked: |
   You have blocked %other%.
 player_unblocked: |
