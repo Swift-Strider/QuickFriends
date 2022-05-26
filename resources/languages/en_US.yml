@@ -14,7 +14,7 @@ friend_request_received: |
 friend_added: |
   You are now friends with %other%!
 friend_removed: |
-  You are no longer friends with d%other%.
+  You are no longer friends with %other%.
 player_blocked: |
   You have blocked %other%.
 player_unblocked: |
