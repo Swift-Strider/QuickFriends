@@ -62,6 +62,14 @@ final class SocialPlayerApi
     }
 
     /**
+     * @phpstan-return Generator<mixed, mixed, mixed, BlockRelation[]>
+     */
+    public function listBlocked(PlayerHandle $player): Generator
+    {
+        return $this->database->listBlocked($player->uuid());
+    }
+
+    /**
      * Tries to add $otherUuid as a friend and dispatches a
      * FriendRequestEvent if applicable.
      *

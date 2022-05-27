@@ -48,6 +48,11 @@ final class SocialModule implements Module
         });
     }
 
+    public function tryGetSocialPlayerApi(): ?SocialPlayerApi
+    {
+        return $this->socialPlayerApi ?? null;
+    }
+
     /**
      * @phpstan-return Generator<mixed, mixed, mixed, SocialPlayerApi>
      */
