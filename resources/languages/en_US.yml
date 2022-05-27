@@ -7,6 +7,10 @@
 # (and has more new messages).
 keep_file_edits: false
 
+command_unavailable: |
+  This command is currently unavailable, try again in a few seconds.
+invalid_target_self: |
+  You can't run this command on yourself.
 friend_request_sent: |
   You sent a friend request to %receiver%! Expires in %expire_time%!
 friend_request_received: |
@@ -21,3 +25,33 @@ player_blocked: |
   You have blocked %other%.
 player_unblocked: |
   You have unblocked %other%.
+join_succeeded: |
+  You have been teleported to %other%.
+join_failed: |
+  You cannot be teleported to %other% right now.
+join_not_friends: |
+  You're not friends with %other%.
+list_friends_header: |
+  You have %count% friend(s).
+list_friends_entry: |2
+    %name% - %status%
+list_blocked_header: |
+  You have %count% blocked player(s).
+list_blocked_entry: |2
+    %name% - %status%
+friend_error_blocked: |
+  You can't friend %other% as you have them blocked!
+friend_error_blocked_by: |
+  %other% has you blocked!
+friend_error_already_friends: |
+  You are already friends with %other%.
+friend_error_limit_reached: |
+  You have ran out of friend slots!
+friend_error_other_limit_reached: |
+  %other% does not have a friend slot available.
+unfriend_error_not_friends: |
+  You are not friends with %other%.
+block_error_already_blocked: |
+  You have already blocked %other%.
+unblock_error_not_blocked: |
+  You have not blocked %other%.

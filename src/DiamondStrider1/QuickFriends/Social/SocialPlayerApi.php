@@ -21,6 +21,10 @@ use pocketmine\player\Player;
 
 final class SocialPlayerApi
 {
+    public const JOIN_RESULT_SUCCEEDED = 0;
+    public const JOIN_RESULT_FAILED = 1;
+    public const JOIN_RESULT_NOT_FRIENDS = 2;
+
     public const FRIEND_RESULT_NOW_FRIENDS = 0;
     public const FRIEND_RESULT_NOTIFIED = 1;
     public const FRIEND_RESULT_MUTED = 2;
@@ -51,6 +55,40 @@ final class SocialPlayerApi
     public function getPlayerHandle(Player $player): PlayerHandle
     {
         return $this->socialRuntime->getPlayerHandle($player);
+    }
+
+    public function getPlayer(PlayerHandle $player): ?Player
+    {
+        return $this->socialRuntime->getPlayer($player);
+    }
+
+    /**
+     * @phpstan-return Generator<mixed, mixed, mixed, self::JOIN_RESULT_*>
+     */
+    public function joinPlayer(Player $player, Player $friend): Generator
+    {
+        $playerUuid = $player->getUniqueId()->getHex()->toString();
+        $friendUuid = $friend->getUniqueId()->getHex()->toString();
+        $friends = yield from $this->database->listFriends($playerUuid);
+        foreach ($friends as $f) {
+            if (
+                $f->requester()->uuid() === $friendUuid ||
+                $f->accepter()->uuid() === $friendUuid
+            ) {
+                $friendWorld = $friend->getWorld();
+
+                $isFiltered = $this->socialConfig->joinableWorlds()->isFilteredOut($friendWorld->getFolderName());
+                if ($isFiltered) {
+                    return self::JOIN_RESULT_FAILED;
+                }
+
+                $player->teleport($friend->getLocation());
+
+                return self::JOIN_RESULT_SUCCEEDED;
+            }
+        }
+
+        return self::JOIN_RESULT_NOT_FRIENDS;
     }
 
     /**

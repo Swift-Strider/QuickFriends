@@ -4,3 +4,21 @@ author: DiamondStrider1
 main: DiamondStrider1\QuickFriends\Main
 version: 1.0.0
 api: 4.0.0
+
+permissions:
+  quickfriends.friends:
+    default: true
+  quickfriends.friends.add:
+    default: true
+  quickfriends.friends.remove:
+    default: true
+  quickfriends.friends.list:
+    default: true
+  quickfriends.friends.block:
+    default: true
+  quickfriends.friends.unblock:
+    default: true
+  quickfriends.friends.listblocked:
+    default: true
+  quickfriends.friends.join:
+    default: true

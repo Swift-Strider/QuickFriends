@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace DiamondStrider1\QuickFriends;
 
+use DiamondStrider1\QuickFriends\Config\ConfigModule;
+use DiamondStrider1\QuickFriends\Database\DatabaseModule;
+use DiamondStrider1\QuickFriends\Language\LanguageModule;
 use DiamondStrider1\QuickFriends\Modules\EmptyCloseTrait;
 use DiamondStrider1\QuickFriends\Modules\InjectArgsTrait;
 use DiamondStrider1\QuickFriends\Modules\Module;
@@ -11,8 +14,8 @@ use DiamondStrider1\QuickFriends\Social\SocialModule;
 use DiamondStrider1\QuickFriends\Social\SocialPlayerApi;
 use DiamondStrider1\QuickFriends\Structures\Friendship;
 use DiamondStrider1\QuickFriends\Structures\PlayerHandle;
+use DiamondStrider1\QuickFriends\UserInterface\UserInterfaceModule;
 use Logger;
-use pocketmine\plugin\PluginBase;
 use pocketmine\Server;
 use SOFe\AwaitGenerator\Await;
 
@@ -23,10 +26,13 @@ final class MainModule implements Module
 
     public function __construct(
         Logger $logger,
-        PluginBase $plugin,
+        public ConfigModule $configModule,
+        public DatabaseModule $databaseModule,
+        public LanguageModule $languageModule,
         public SocialModule $socialModule,
+        public UserInterfaceModule $userInterfaceModule,
     ) {
-        Await::f2c(function () use ($logger, $plugin, $socialModule) {
+        Await::f2c(function () use ($logger, $socialModule) {
             $first = new PlayerHandle('uuid1', 'PlayerOne', 'Windows 10', $t = time());
             $second = new PlayerHandle('uuid2', 'PlayerTwo', 'Android', $t);
             $third = new PlayerHandle('uuid3', 'PlayerThree', 'Android', $t);

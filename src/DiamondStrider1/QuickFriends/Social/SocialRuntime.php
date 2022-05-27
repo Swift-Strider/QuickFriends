@@ -28,6 +28,10 @@ final class SocialRuntime
      * @var array<string, PlayerHandle>
      */
     private array $handles = [];
+    /**
+     * @var array<string, Player>
+     */
+    private array $players = [];
 
     public function __construct(
         private SocialConfig $socialConfig,
@@ -49,6 +53,7 @@ final class SocialRuntime
             function (PlayerQuitEvent $ev) {
                 $uuid = $ev->getPlayer()->getUniqueId()->getHex()->toString();
                 unset($this->handles[$uuid]);
+                unset($this->players[$uuid]);
                 foreach ($this->friendRequests as $id => $request) {
                     if ($request->requester()->uuid() === $uuid || $request->receiver()->uuid() === $uuid) {
                         unset($this->friendRequests[$id]);
@@ -83,6 +88,7 @@ final class SocialRuntime
             default => '<unknown>',
         };
         $this->handles[$uuid] = new PlayerHandle($uuid, $username, $os, $time);
+        $this->players[$uuid] = $player;
     }
 
     public function addFriendRequest(FriendRequest $friendRequest): int
@@ -112,6 +118,11 @@ final class SocialRuntime
     {
         $id = $requester.':'.$receiver;
         unset($this->friendRequests[$id]);
+    }
+
+    public function getPlayer(PlayerHandle $player): ?Player
+    {
+        return $this->players[$player->uuid()] ?? null;
     }
 
     public function getPlayerHandle(Player $player): PlayerHandle
