@@ -5,4 +5,11 @@ branches:
 projects:
   QuickFriends:
     path: ""
+    libs:
+      - src: poggit/libasynql/libasynql
+        version: ^4.0
+        epitope: .random
+      - src: sof3/await-generator/await-generator
+        version: ^3.4
+        epitope: .random
 ...
