@@ -8,29 +8,30 @@
 keep_file_edits: false
 
 command_unavailable: |
-  This command is currently unavailable, try again in a few seconds.
+  §cThis command is currently unavailable, try again in a few seconds.
 invalid_target_self: |
-  You can't run this command on yourself.
+  §cYou can't run this command on yourself.
 friend_request_sent: |
-  You sent a friend request to %receiver%! Expires in %expire_time%!
+  You sent a friend request to §a%receiver%§r! Expires in §g%expire_time%§r!
 friend_request_received: |
-  %sender% sent you a friend request that expires in %expire_time%!
+  §a%sender%§r sent you a friend request that expires in §g%expire_time%§r!
+  Accept the friend request with §g/f add %sender%.
 friend_added: |
-  You are now friends with %other%!
+  You are now friends with §a%other%§r!
 friend_removed: |
-  You are no longer friends with %other%.
+  You are no longer friends with §a%other%§r.
 player_blocked_and_unfriended: |
-  You have blocked and are no longer friends with %other%.
+  You have blocked and are no longer friends with §a%other%§r.
 player_blocked: |
-  You have blocked %other%.
+  You have blocked §a%other%§r.
 player_unblocked: |
-  You have unblocked %other%.
+  You have unblocked §a%other%§r.
 join_succeeded: |
-  You have been teleported to %other%.
+  You have been teleported to §a%other%§r.
 join_failed: |
-  You cannot be teleported to %other% right now.
+  §cYou cannot be teleported to §a%other%§c right now.
 join_not_friends: |
-  You're not friends with %other%.
+  §cYou're not friends with §a%other%§c.
 list_friends_header: |
   You have %count% friend(s).
 list_friends_entry: |2
@@ -40,18 +41,18 @@ list_blocked_header: |
 list_blocked_entry: |2
     %name% - %status%
 friend_error_blocked: |
-  You can't friend %other% as you have them blocked!
+  §cYou can't friend §a%other%§c as you have them blocked!
 friend_error_blocked_by: |
-  %other% has you blocked!
+  §a%other%§c has you blocked!
 friend_error_already_friends: |
-  You are already friends with %other%.
+  §cYou are already friends with §a%other%§c.
 friend_error_limit_reached: |
-  You can't friend %other% as you have ran out of friend slots!
+  §cYou can't friend §a%other%§c as you have ran out of friend slots!
 friend_error_other_limit_reached: |
-  %other% does not have a friend slot available.
+  §a%other%§c does not have a friend slot available.
 unfriend_error_not_friends: |
-  You are not friends with %other%.
+  §cYou are not friends with §a%other%§c.
 block_error_already_blocked: |
-  You have already blocked %other%.
+  §cYou have already blocked §a%other%§c.
 unblock_error_not_blocked: |
-  You have not blocked %other%.
+  §cYou have not blocked §a%other%§c.
