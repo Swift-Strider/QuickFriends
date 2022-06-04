@@ -6,6 +6,9 @@ projects:
   QuickFriends:
     path: ""
     libs:
+      - src: Swift-Strider/Remark/Remark
+        version: ^1.2.1
+        epitope: .random
       - src: poggit/libasynql/libasynql
         version: ^4.0
         epitope: .random

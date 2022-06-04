@@ -6,19 +6,21 @@ version: 1.0.0
 api: 4.0.0
 
 permissions:
-  quickfriends.friends:
+  quickfriends.command.friend:
     default: true
-  quickfriends.friends.add:
+  quickfriends.command.friend.add:
     default: true
-  quickfriends.friends.remove:
+  quickfriends.command.friend.remove:
     default: true
-  quickfriends.friends.list:
+  quickfriends.command.friend.list:
     default: true
-  quickfriends.friends.block:
+  quickfriends.command.friend.join:
     default: true
-  quickfriends.friends.unblock:
+  quickfriends.command.block:
     default: true
-  quickfriends.friends.listblocked:
+  quickfriends.command.block.add:
     default: true
-  quickfriends.friends.join:
+  quickfriends.command.block.remove:
+    default: true
+  quickfriends.command.block.list:
     default: true

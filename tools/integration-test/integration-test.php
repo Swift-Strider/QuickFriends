@@ -45,6 +45,7 @@ $virions = "build/virions";
 download($consoleScript, "https://github.com/pmmp/DevTools/raw/master/src/ConsoleScript.php");
 download("$virions/libasynql.phar", "https://poggit.pmmp.io/r/177279/libasynql_dev-177.phar");
 download("$virions/await-generator.phar", "https://poggit.pmmp.io/r/167785/await-generator_dev-83.phar");
+download("$virions/Remark.phar", "https://github.com/Swift-Strider/Remark/releases/download/v1.2.1/Remark.phar");
 
 foreach (new DirectoryIterator($testsLocation) as $file) {
     if ($file->isDot() || !$file->isDir()) continue;
@@ -88,6 +89,7 @@ foreach (new DirectoryIterator($testsLocation) as $file) {
     run("$php $consoleScript --make $sourcesString --relative build/generated --out build/QuickFriends.phar");
     run("$php $virions/libasynql.phar build/QuickFriends.phar");
     run("$php $virions/await-generator.phar build/QuickFriends.phar");
+    run("$php $virions/Remark.phar build/QuickFriends.phar");
 
     echo "! Done\n";
 

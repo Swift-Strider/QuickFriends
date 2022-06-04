@@ -16,17 +16,29 @@ friends to.
 
 # Commands
 
-All commands are subcommands of `/f` and `/friend`.
+|Names|Description|
+|:----|----------:|
+|/f <player>, /f add <player>|Adds a friend|
+|/f remove <player>|Removes a friend|
+|/f list|Lists friends|
+|/f join|Teleport to a player, if the world is joinable|
+|/block, /block add|Blocks a player|
+|/block remove|Unblocks a player|
+|/block list|Lists blocked players|
 
-**`/f <subcommand>`**
-* **`add`**, **`remove`**, **`list`** - manage your friends
-* **`block`**, **`unblock`**, **`listblocked`** - manage people you block
-  from sending you friend requests
-* **`join`** - teleport to a friend if the friend's world has `/f join` enabled for it
+/friend is an alias of /f
 
-## Easy Command Running
+# Permissions
 
-Running `/f` by itself will spawn a form for ease-of-use.
+* quickfriends.command.friend - /f
+  * quickfriends.command.friend.add
+  * quickfriends.command.friend.remove
+  * quickfriends.command.friend.list
+  * quickfriends.command.friend.join
+* quickfriends.command.block - /block
+  * quickfriends.command.block.add
+  * quickfriends.command.block.remove
+  * quickfriends.command.block.list
 
 # Config
 

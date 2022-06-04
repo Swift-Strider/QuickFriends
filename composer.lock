@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8c1d0bb804866dfc0a1d2df417d1d907",
+    "content-hash": "1e26733a24788da187bdea6b411ff172",
     "packages": [
         {
             "name": "adhocore/json-comment",
@@ -120,6 +120,47 @@
                 }
             ],
             "time": "2021-08-15T20:50:18+00:00"
+        },
+        {
+            "name": "diamondstrider1/remark",
+            "version": "1.2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Swift-Strider/Remark.git",
+                "reference": "8c24e3854b43626e1d03d7c5fcdbf4bae6a6ae53"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Swift-Strider/Remark/zipball/8c24e3854b43626e1d03d7c5fcdbf4bae6a6ae53",
+                "reference": "8c24e3854b43626e1d03d7c5fcdbf4bae6a6ae53",
+                "shasum": ""
+            },
+            "require": {
+                "pocketmine/pocketmine-mp": "^4.0.0",
+                "sof3/await-generator": "^3.3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "DiamondStrider1\\Remark\\": "src/DiamondStrider1/Remark/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "DiamondStrider1",
+                    "email": "62265561+Swift-Strider@users.noreply.github.com"
+                }
+            ],
+            "description": "UI virion (library) for PocketMine-MP plugins",
+            "support": {
+                "issues": "https://github.com/Swift-Strider/Remark/issues",
+                "source": "https://github.com/Swift-Strider/Remark/tree/v1.2.1"
+            },
+            "time": "2022-06-04T11:29:27+00:00"
         },
         {
             "name": "fgrosse/phpasn1",

@@ -10,7 +10,8 @@
         "php": "^8.0.0",
 		"pocketmine/pocketmine-mp": "4.0.0",
         "sof3/libasynql": "^4.0",
-        "sof3/await-generator": "^3.4"
+        "sof3/await-generator": "^3.4",
+        "diamondstrider1/remark": "^1.2.1"
     },
 
     "scripts": {

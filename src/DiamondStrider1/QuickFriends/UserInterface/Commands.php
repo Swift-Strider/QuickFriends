@@ -4,37 +4,42 @@ declare(strict_types=1);
 
 namespace DiamondStrider1\QuickFriends\UserInterface;
 
-use DiamondStrider1\QuickFriends\Command\AttributedCommandTrait;
-use DiamondStrider1\QuickFriends\Command\attributes\CommandGroup;
-use DiamondStrider1\QuickFriends\Command\attributes\CommandSettings;
-use DiamondStrider1\QuickFriends\Command\OverloadedCommand;
 use DiamondStrider1\QuickFriends\Language\LanguageModule;
 use DiamondStrider1\QuickFriends\Social\SocialModule;
 use DiamondStrider1\QuickFriends\Social\SocialPlayerApi;
+use DiamondStrider1\Remark\Command\Arg\player_arg;
+use DiamondStrider1\Remark\Command\Arg\sender;
+use DiamondStrider1\Remark\Command\Cmd;
+use DiamondStrider1\Remark\Command\CmdConfig;
+use DiamondStrider1\Remark\Command\Guard\permission;
 use Generator;
 use InvalidArgumentException;
 use pocketmine\player\Player;
 
-#[CommandGroup(
-    description: 'Manage ranks on your server!',
-    permission: 'quickfriends.friends'
+#[CmdConfig(
+    name: 'f',
+    description: 'Manage your friends on the server',
+    aliases: ['friend'],
+    permission: 'quickfriends.command.friend',
 )]
-class FriendCommand implements OverloadedCommand
+#[CmdConfig(
+    name: 'block',
+    description: 'Manage your blocked players on the server',
+    aliases: [],
+    permission: 'quickfriends.command.block',
+)]
+final class Commands
 {
-    use AttributedCommandTrait;
-
     public function __construct(
         public LanguageModule $languageModule,
         public SocialModule $socialModule,
     ) {
     }
 
-    #[CommandSettings(
-        name: 'add',
-        permission: 'quickfriends.friends.add',
-        description: 'Add someone to your friends list!',
-    )]
-    public function add(Player $sender, Player $other): Generator
+    #[Cmd('f', 'add'), Cmd('f')]
+    #[permission('quickfriends.command.friend.add')]
+    #[sender(), player_arg()]
+    public function friendAdd(Player $sender, Player $other): Generator
     {
         $lang = $this->languageModule->getPlayerLanguage($sender);
         if ($sender === $other) {
@@ -72,13 +77,10 @@ class FriendCommand implements OverloadedCommand
         }
     }
 
-    #[CommandSettings(
-        name: 'remove',
-        permission: 'quickfriends.friends.remove',
-        description: 'Remove a player from your friends list!',
-        aliases: ['rm']
-    )]
-    public function remove(Player $sender, Player $other): Generator
+    #[Cmd('f', 'remove'), Cmd('f', 'rm')]
+    #[permission('quickfriends.command.friend.remove')]
+    #[sender(), player_arg()]
+    public function friendRemove(Player $sender, Player $other): Generator
     {
         $lang = $this->languageModule->getPlayerLanguage($sender);
         if ($sender === $other) {
@@ -112,12 +114,9 @@ class FriendCommand implements OverloadedCommand
         }
     }
 
-    #[CommandSettings(
-        name: 'list',
-        permission: 'quickfriends.friends.list',
-        description: 'List the people on your friends list!',
-    )]
-    public function list(Player $sender): Generator
+    #[Cmd('f', 'list'), permission('quickfriends.command.friend.list')]
+    #[sender()]
+    public function friendList(Player $sender): Generator
     {
         $lang = $this->languageModule->getPlayerLanguage($sender);
         $api = $this->socialModule->tryGetSocialPlayerApi();
@@ -150,14 +149,16 @@ class FriendCommand implements OverloadedCommand
         }
     }
 
-    #[CommandSettings(
-        name: 'listblocked',
-        permission: 'quickfriends.friends.listblocked',
-        description: 'List the people on your block list!',
-    )]
-    public function listblocked(Player $sender): Generator
+    #[Cmd('f', 'join'), permission('quickfriends.command.friend.join')]
+    #[sender(), player_arg()]
+    public function friendJoin(Player $sender, Player $friend): Generator
     {
         $lang = $this->languageModule->getPlayerLanguage($sender);
+        if ($sender === $friend) {
+            $sender->sendMessage($lang->invalid_target_self());
+
+            return;
+        }
         $api = $this->socialModule->tryGetSocialPlayerApi();
         if (null === $api) {
             $sender->sendMessage($lang->command_unavailable());
@@ -165,35 +166,18 @@ class FriendCommand implements OverloadedCommand
             return;
         }
 
-        try {
-            $senderHandle = $api->getPlayerHandle($sender);
-        } catch (InvalidArgumentException) {
-            $sender->sendMessage($lang->command_unavailable());
-
-            return; // A player hasn't fully joined yet.
-        }
-
-        $blocked = yield from $api->listBlocked($senderHandle);
-        $sender->sendMessage($lang->list_blocked_header((string) count($blocked)));
-        foreach ($blocked as $f) {
-            // @phpstan-ignore-next-line phpstan doesn't understand match(bool)
-            $otherHandle = match ($f->player()->uuid() === $senderHandle->uuid()) {
-                true => $f->player(),
-                false => $f->blocked(),
-            };
-            $status = null !== $api->getPlayer($otherHandle) ? 'online' : 'offline';
-            $sender->sendMessage($lang->list_blocked_entry(
-                $otherHandle->username(), $status,
-            ));
-        }
+        $code = yield from $api->joinPlayer($sender, $friend);
+        $sender->sendMessage(match ($code) {
+            SocialPlayerApi::JOIN_RESULT_SUCCEEDED => $lang->join_succeeded($friend->getName()),
+            SocialPlayerApi::JOIN_RESULT_FAILED => $lang->join_failed($friend->getName()),
+            SocialPlayerApi::JOIN_RESULT_NOT_FRIENDS => $lang->join_not_friends($friend->getName()),
+        });
     }
 
-    #[CommandSettings(
-        name: 'block',
-        permission: 'quickfriends.friends.block',
-        description: 'Block a player from friending you!',
-    )]
-    public function block(Player $sender, Player $other): Generator
+    #[Cmd('block', 'add'), Cmd('block')]
+    #[permission('quickfriends.command.block.add')]
+    #[sender(), player_arg()]
+    public function blockAdd(Player $sender, Player $other): Generator
     {
         $lang = $this->languageModule->getPlayerLanguage($sender);
         if ($sender === $other) {
@@ -227,12 +211,9 @@ class FriendCommand implements OverloadedCommand
         }
     }
 
-    #[CommandSettings(
-        name: 'unblock',
-        permission: 'quickfriends.friends.unblock',
-        description: 'Unblock a player from friending you!',
-    )]
-    public function unblock(Player $sender, Player $other): Generator
+    #[Cmd('block', 'remove'), permission('quickfriends.command.block.remove')]
+    #[sender(), player_arg()]
+    public function blockRemove(Player $sender, Player $other): Generator
     {
         $lang = $this->languageModule->getPlayerLanguage($sender);
         if ($sender === $other) {
@@ -266,19 +247,11 @@ class FriendCommand implements OverloadedCommand
         }
     }
 
-    #[CommandSettings(
-        name: 'join',
-        permission: 'quickfriends.friends.join',
-        description: 'Teleport to a friend!',
-    )]
-    public function join(Player $sender, Player $friend): Generator
+    #[Cmd('block', 'list'), permission('quickfriends.command.block.list')]
+    #[sender()]
+    public function blockList(Player $sender): Generator
     {
         $lang = $this->languageModule->getPlayerLanguage($sender);
-        if ($sender === $friend) {
-            $sender->sendMessage($lang->invalid_target_self());
-
-            return;
-        }
         $api = $this->socialModule->tryGetSocialPlayerApi();
         if (null === $api) {
             $sender->sendMessage($lang->command_unavailable());
@@ -286,11 +259,26 @@ class FriendCommand implements OverloadedCommand
             return;
         }
 
-        $code = yield from $api->joinPlayer($sender, $friend);
-        $sender->sendMessage(match ($code) {
-            SocialPlayerApi::JOIN_RESULT_SUCCEEDED => $lang->join_succeeded($friend->getName()),
-            SocialPlayerApi::JOIN_RESULT_FAILED => $lang->join_failed($friend->getName()),
-            SocialPlayerApi::JOIN_RESULT_NOT_FRIENDS => $lang->join_not_friends($friend->getName()),
-        });
+        try {
+            $senderHandle = $api->getPlayerHandle($sender);
+        } catch (InvalidArgumentException) {
+            $sender->sendMessage($lang->command_unavailable());
+
+            return; // A player hasn't fully joined yet.
+        }
+
+        $blocked = yield from $api->listBlocked($senderHandle);
+        $sender->sendMessage($lang->list_blocked_header((string) count($blocked)));
+        foreach ($blocked as $f) {
+            // @phpstan-ignore-next-line phpstan doesn't understand match(bool)
+            $otherHandle = match ($f->player()->uuid() === $senderHandle->uuid()) {
+                true => $f->player(),
+                false => $f->blocked(),
+            };
+            $status = null !== $api->getPlayer($otherHandle) ? 'online' : 'offline';
+            $sender->sendMessage($lang->list_blocked_entry(
+                $otherHandle->username(), $status,
+            ));
+        }
     }
 }
