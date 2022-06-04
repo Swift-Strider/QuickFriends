@@ -77,13 +77,13 @@ foreach ($entries as $name => $value) {
         EOT;
         continue;
     }
-    $matches = $matches[1];
+    $matches = array_unique($matches[1]);
     sort($matches);
     $params = implode(', ', array_map(fn($m) => "string \$$m", $matches));
     $replace = implode(', ', array_map(fn($m) => "'%$m%'", $matches));
     $replaceParams = implode(', ', array_map(fn($m) => "\$$m", $matches));
 
-    if ($count === 1) {
+    if (count($matches) === 1) {
         $languageMethods .= "\n\n" . <<<EOT
             public function $name($params): string
             {
