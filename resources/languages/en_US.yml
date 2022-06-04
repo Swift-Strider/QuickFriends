@@ -46,7 +46,7 @@ friend_error_blocked_by: |
 friend_error_already_friends: |
   You are already friends with %other%.
 friend_error_limit_reached: |
-  You have ran out of friend slots!
+  You can't friend %other% as you have ran out of friend slots!
 friend_error_other_limit_reached: |
   %other% does not have a friend slot available.
 unfriend_error_not_friends: |

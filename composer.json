@@ -21,6 +21,7 @@
         ],
         "fmt": "tools/php-cs-fixer/vendor/bin/php-cs-fixer fix --config=tools/php-cs-fixer/.php-cs-fixer.php",
         "phpstan": "tools/phpstan/vendor/bin/phpstan analyze -c tools/phpstan/phpstan.neon",
+        "generate-languages": "php tools/generate-language/generate-language.php",
         "integration-test": [
             "Composer\\Config::disableProcessTimeout",
             "php tools/integration-test/integration-test.php"
