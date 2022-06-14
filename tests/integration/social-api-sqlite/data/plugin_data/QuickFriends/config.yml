@@ -1,6 +1,10 @@
 language:
   default-language: en_US
 
+user-interface:
+  notify-friend-join: true
+  notify-friend-quit: true
+
 social:
   friend-request-duration: 60
   max-friend-limit: 1

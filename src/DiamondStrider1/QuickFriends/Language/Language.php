@@ -15,6 +15,8 @@ final class Language
     public function __construct(
         private string $command_unavailable,
         private string $invalid_target_self,
+        private string $friend_joined,
+        private string $friend_quit,
         private string $friend_request_sent,
         private string $friend_request_received,
         private string $friend_added,
@@ -44,6 +46,8 @@ final class Language
     {
         $command_unavailable = $p->rString('command_unavailable');
         $invalid_target_self = $p->rString('invalid_target_self');
+        $friend_joined = $p->rString('friend_joined');
+        $friend_quit = $p->rString('friend_quit');
         $friend_request_sent = $p->rString('friend_request_sent');
         $friend_request_received = $p->rString('friend_request_received');
         $friend_added = $p->rString('friend_added');
@@ -72,6 +76,8 @@ final class Language
         return new self(
             $command_unavailable->take(),
             $invalid_target_self->take(),
+            $friend_joined->take(),
+            $friend_quit->take(),
             $friend_request_sent->take(),
             $friend_request_received->take(),
             $friend_added->take(),
@@ -105,6 +111,24 @@ final class Language
     public function invalid_target_self(): string
     {
         return $this->invalid_target_self;
+    }
+
+    public function friend_joined(string $friend_name): string
+    {
+        return str_replace(
+            '%friend_name%',
+            $friend_name,
+            $this->friend_joined
+        );
+    }
+
+    public function friend_quit(string $friend_name): string
+    {
+        return str_replace(
+            '%friend_name%',
+            $friend_name,
+            $this->friend_quit
+        );
     }
 
     public function friend_request_sent(string $expire_time, string $receiver): string

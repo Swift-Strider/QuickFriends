@@ -1,6 +1,10 @@
 language:
   default-language: en_US
 
+user-interface:
+  notify-friend-join: true
+  notify-friend-quit: true
+
 social:
   # Time in seconds before a friend request expires.
   friend-request-duration: 60

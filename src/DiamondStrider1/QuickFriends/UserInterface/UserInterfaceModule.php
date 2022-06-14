@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DiamondStrider1\QuickFriends\UserInterface;
 
+use DiamondStrider1\QuickFriends\Config\ConfigModule;
 use DiamondStrider1\QuickFriends\Language\LanguageModule;
 use DiamondStrider1\QuickFriends\Modules\EmptyCloseTrait;
 use DiamondStrider1\QuickFriends\Modules\InjectArgsTrait;
@@ -19,12 +20,14 @@ final class UserInterfaceModule implements Module
 
     public function __construct(
         PluginBase $plugin,
+        ConfigModule $configModule,
         LanguageModule $languageModule,
         SocialModule $socialModule,
     ) {
+        $userInterfaceConfig = $configModule->getConfig()->userInterfaceConfig();
         $pluginManager = $plugin->getServer()->getPluginManager();
 
-        $pluginManager->registerEvents(new EventNotifier($languageModule), $plugin);
+        $pluginManager->registerEvents(new EventNotifier($languageModule, $socialModule, $userInterfaceConfig), $plugin);
         Remark::command($plugin, new Commands($languageModule, $socialModule));
         Remark::activate($plugin);
     }

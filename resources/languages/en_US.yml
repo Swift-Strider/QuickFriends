@@ -11,6 +11,10 @@ command_unavailable: |
   §cThis command is currently unavailable, try again in a few seconds.
 invalid_target_self: |
   §cYou can't run this command on yourself.
+friend_joined: |
+  %friend_name% joined the game!
+friend_quit: |
+  %friend_name% left the game!
 friend_request_sent: |
   You sent a friend request to §a%receiver%§r! Expires in §g%expire_time%§r!
 friend_request_received: |
